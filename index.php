@@ -1016,6 +1016,384 @@
                 padding: 9px 8px;
             }
         }
+
+        /* ===== TEMA CLARO PROFISSIONAL ===== */
+        :root {
+            --page-bg: #f4f7fb;
+            --panel: #ffffff;
+            --panel-muted: #f8fafc;
+            --panel-soft: #eef4f8;
+            --border: #d8e1ea;
+            --border-strong: #bfd0dd;
+            --text: #152331;
+            --muted: #617181;
+            --brand: #c99322;
+            --brand-strong: #9f7318;
+            --blue: #2563eb;
+            --green: #15803d;
+            --cyan: #0e7490;
+            --purple: #6d28d9;
+            --amber: #d97706;
+            --red: #dc2626;
+            --shadow-soft: 0 10px 28px rgba(21, 35, 49, .08);
+            --shadow-hover: 0 16px 36px rgba(21, 35, 49, .13);
+        }
+
+        html {
+            background: var(--page-bg);
+        }
+
+        body {
+            background:
+                linear-gradient(180deg, #f9fbfd 0%, #f4f7fb 46%, #eef4f8 100%) !important;
+            color: var(--text) !important;
+        }
+
+        body::before {
+            display: none !important;
+        }
+
+        .main-wrapper {
+            width: min(100%, 1840px);
+            padding: 18px 22px 28px;
+        }
+
+        .login-screen {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.92), rgba(238,244,248,.95)),
+                linear-gradient(135deg, #f9fbfd, #e9f0f6) !important;
+        }
+
+        .login-card,
+        .app-header,
+        .admin-bar,
+        .busca-rapida,
+        .filtros-container,
+        .table-container,
+        .stat-card,
+        .modal-content {
+            background: var(--panel) !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: var(--shadow-soft) !important;
+            color: var(--text) !important;
+        }
+
+        .login-card {
+            border-top: 4px solid var(--brand) !important;
+        }
+
+        .login-logo h2,
+        .logo-area h1,
+        .modal-header h2,
+        .filtros-header h3,
+        th {
+            color: var(--text) !important;
+        }
+
+        .login-logo p,
+        .credenciais-info,
+        .stat-detalhe,
+        .input-group label,
+        .form-group label,
+        .filtros-header span,
+        .user-info span {
+            color: var(--muted) !important;
+        }
+
+        .logo-placeholder,
+        .login-logo .logo-placeholder,
+        .logo-area .logo-placeholder {
+            background: #ffffff !important;
+            border: 1px solid var(--border) !important;
+            box-shadow: 0 8px 20px rgba(21, 35, 49, .09) !important;
+        }
+
+        .company-logo {
+            background: #ffffff;
+        }
+
+        .app-header {
+            top: 12px;
+            border-radius: 12px !important;
+        }
+
+        .logo-area h1::after {
+            color: var(--muted) !important;
+        }
+
+        .user-badge,
+        #mysqlStatus,
+        .credenciais-info,
+        .stat-palete-item,
+        .cliente-palete-card,
+        .btn-mini,
+        [style*="background:#0f1a24"],
+        [style*="background:#1e2a3a"],
+        [style*="background:#1a3a2a"],
+        [style*="background:#2a1a1a"] {
+            background: var(--panel-muted) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+        }
+
+        #mysqlStatus {
+            color: var(--green) !important;
+            background: #ecfdf3 !important;
+            border-color: #b7e4c7 !important;
+        }
+
+        .user-avatar {
+            background: linear-gradient(135deg, var(--brand), #f1c85b) !important;
+            color: #1f2933 !important;
+        }
+
+        .admin-bar {
+            align-items: center;
+            border-left: 4px solid var(--brand) !important;
+        }
+
+        .admin-bar::before {
+            color: var(--brand-strong) !important;
+        }
+
+        .action-buttons {
+            gap: 12px;
+        }
+
+        .btn-action,
+        .btn-admin,
+        .btn-login,
+        .btn-buscar,
+        .btn-filtrar,
+        .btn-limpar,
+        .btn-acao,
+        .btn-mini,
+        .btn-logout {
+            border-radius: 8px !important;
+            box-shadow: none !important;
+            font-weight: 800 !important;
+        }
+
+        .btn-login,
+        .btn-action-primary,
+        .btn-admin,
+        .btn-buscar,
+        .btn-filtrar {
+            background: linear-gradient(135deg, #f4c95d, var(--brand)) !important;
+            color: #17202a !important;
+            border: 1px solid #d5a23b !important;
+        }
+
+        .btn-action-warning {
+            background: #fff7ed !important;
+            color: #9a3412 !important;
+            border: 1px solid #fed7aa !important;
+        }
+
+        .btn-action-purple {
+            background: #f5f3ff !important;
+            color: var(--purple) !important;
+            border: 1px solid #ddd6fe !important;
+        }
+
+        .btn-action-info {
+            background: #ecfeff !important;
+            color: var(--cyan) !important;
+            border: 1px solid #a5f3fc !important;
+        }
+
+        .btn-action-secondary,
+        .btn-limpar,
+        .btn-logout {
+            background: #f1f5f9 !important;
+            color: #334155 !important;
+            border: 1px solid var(--border) !important;
+        }
+
+        .btn-action:hover,
+        .btn-admin:hover,
+        .btn-login:hover,
+        .btn-buscar:hover,
+        .btn-filtrar:hover,
+        .btn-limpar:hover,
+        .btn-mini:hover,
+        .btn-logout:hover,
+        .stat-card:hover,
+        .cliente-palete-card:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-hover) !important;
+            filter: none !important;
+        }
+
+        .busca-rapida,
+        .filtros-container {
+            padding: 16px !important;
+        }
+
+        input,
+        select,
+        textarea,
+        .busca-grid input,
+        .filtros-grid select,
+        .filtros-grid input,
+        .form-group input,
+        .form-group select,
+        .form-group textarea,
+        .input-group input {
+            background: #ffffff !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border-strong) !important;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #8a98a8 !important;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--brand) !important;
+            box-shadow: 0 0 0 3px rgba(201, 147, 34, .16) !important;
+        }
+
+        .dashboard-horizontal {
+            gap: 14px;
+        }
+
+        .stat-card {
+            border-radius: 10px !important;
+            border-left: 4px solid transparent !important;
+        }
+
+        .card-destaque {
+            background: linear-gradient(180deg, #ffffff, #fffaf0) !important;
+            border-left-color: var(--brand) !important;
+        }
+
+        .stat-header i {
+            color: var(--brand) !important;
+        }
+
+        .stat-title {
+            color: var(--muted) !important;
+            letter-spacing: .05em !important;
+        }
+
+        .stat-value,
+        .stat-cliente-valor,
+        .qtde-numero {
+            color: var(--text) !important;
+        }
+
+        .stat-cliente-nome {
+            color: var(--brand-strong) !important;
+        }
+
+        .cliente-palete-card {
+            border-radius: 8px !important;
+        }
+
+        .table-container {
+            border-radius: 10px !important;
+            max-height: 560px !important;
+            overflow: auto;
+        }
+
+        table {
+            background: #ffffff !important;
+            color: var(--text) !important;
+        }
+
+        th {
+            background: #edf3f8 !important;
+            border-bottom: 1px solid var(--border-strong) !important;
+        }
+
+        td {
+            color: #334155 !important;
+            border-bottom: 1px solid #e5edf3 !important;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc !important;
+        }
+
+        tr:hover {
+            background: #fff8e6 !important;
+        }
+
+        .badge {
+            border-radius: 999px !important;
+            border: 1px solid transparent;
+        }
+
+        .badge-aberto { background: #fff7ed !important; color: #9a3412 !important; border-color: #fed7aa; }
+        .badge-vale { background: #f5f3ff !important; color: #5b21b6 !important; border-color: #ddd6fe; }
+        .badge-concluido { background: #ecfdf3 !important; color: #166534 !important; border-color: #bbf7d0; }
+        .badge-em-coleta { background: #ecfeff !important; color: #155e75 !important; border-color: #a5f3fc; }
+        .badge-batida { background: #fef2f2 !important; color: #991b1b !important; border-color: #fecaca; }
+
+        .modal {
+            background: rgba(15, 23, 42, .38) !important;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-header {
+            background: #f8fafc !important;
+            border-bottom: 1px solid var(--border) !important;
+        }
+
+        .opcao-retorno {
+            background: #ffffff !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+        }
+
+        .opcao-retorno:hover,
+        .opcao-retorno.selected {
+            background: #ecfdf3 !important;
+            border-color: #86efac !important;
+        }
+
+        .toast {
+            background: #ffffff !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border-strong) !important;
+        }
+
+        .qtde-c {
+            background: linear-gradient(135deg, #f4c95d, var(--brand)) !important;
+            color: #17202a !important;
+        }
+
+        .modal-close:hover,
+        .btn-logout:hover {
+            background: #fef2f2 !important;
+            color: var(--red) !important;
+            border-color: #fecaca !important;
+        }
+
+        .error-msg,
+        .danger-text {
+            color: var(--red) !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                padding: 10px;
+            }
+
+            .app-header,
+            .login-card,
+            .admin-bar,
+            .busca-rapida,
+            .filtros-container,
+            .table-container,
+            .stat-card {
+                border-radius: 8px !important;
+            }
+        }
     </style>
 </head>
 <body>
