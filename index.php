@@ -1540,6 +1540,10 @@
             <p>👑 Master: <strong>admin</strong> / <strong>admin123</strong></p>
             <p>👤 Motorista: <strong>motorista</strong> / <strong>123456</strong></p>
             <p>📋 Conferente: <strong>conferente</strong> / <strong>123456</strong></p>
+            <p>🧾 Faturamento: <strong>faturamento</strong> / <strong>123456</strong></p>
+            <p>🚚 Transportadora: <strong>transportadora</strong> / <strong>123456</strong></p>
+            <p>📦 Encarregado: <strong>encarregado</strong> / <strong>123456</strong></p>
+            <p>🏭 Almoxarifado: <strong>almoxarifado</strong> / <strong>123456</strong></p>
         </div>
     </div>
 </div>
@@ -1561,23 +1565,23 @@
         
         <!-- Admin Bar -->
         <div id="adminBar" class="admin-bar" style="display: none;">
-            <button class="btn-admin" onclick="abrirModalUsuarios()"><i class="fas fa-users"></i> Gerenciar Usuários</button>
-            <button class="btn-admin" onclick="abrirModalCliente()"><i class="fas fa-building"></i> Cadastrar Cliente</button>
-            <button class="btn-admin" onclick="abrirModalTransportadora()"><i class="fas fa-truck"></i> Cadastrar Transportadora</button>
-            <button class="btn-admin" onclick="abrirModalRepresentante()"><i class="fas fa-user-tie"></i> Cadastrar Representante</button>
-            <button class="btn-admin" onclick="abrirModalImportar()"><i class="fas fa-file-import"></i> Importar CSV/Backup</button>
-            <button class="btn-admin" onclick="gerarBackup()"><i class="fas fa-database"></i> Backup</button>
-            <button class="btn-admin" onclick="resetarDadosDemo()"><i class="fas fa-rotate-left"></i> Restaurar Demo</button>
+            <button class="btn-admin" id="btnAdminUsuarios" onclick="abrirModalUsuarios()"><i class="fas fa-users"></i> Gerenciar Usuários</button>
+            <button class="btn-admin" id="btnAdminCliente" onclick="abrirModalCliente()"><i class="fas fa-building"></i> Cadastrar Cliente</button>
+            <button class="btn-admin" id="btnAdminTransportadora" onclick="abrirModalTransportadora()"><i class="fas fa-truck"></i> Cadastrar Transportadora</button>
+            <button class="btn-admin" id="btnAdminRepresentante" onclick="abrirModalRepresentante()"><i class="fas fa-user-tie"></i> Cadastrar Representante</button>
+            <button class="btn-admin" id="btnAdminImportar" onclick="abrirModalImportar()"><i class="fas fa-file-import"></i> Importar CSV/Backup</button>
+            <button class="btn-admin" id="btnAdminBackup" onclick="gerarBackup()"><i class="fas fa-database"></i> Backup</button>
+            <button class="btn-admin" id="btnAdminReset" onclick="resetarDadosDemo()"><i class="fas fa-rotate-left"></i> Restaurar Demo</button>
         </div>
         
         <!-- Action Buttons -->
         <div class="action-buttons">
-            <button class="btn-action btn-action-primary" onclick="abrirModalNovaCarga()"><i class="fas fa-boxes"></i> NOVA CARGA</button>
-            <button class="btn-action btn-action-warning" onclick="abrirModalRetornoCarga()"><i class="fas fa-undo-alt"></i> RETORNO DA CARGA</button>
+            <button class="btn-action btn-action-primary" id="btnNovaCarga" onclick="abrirModalNovaCarga()"><i class="fas fa-boxes"></i> NOVA CARGA</button>
+            <button class="btn-action btn-action-warning" id="btnRetornoCarga" onclick="abrirModalRetornoCarga()"><i class="fas fa-undo-alt"></i> RETORNO DA CARGA</button>
             <button class="btn-action btn-action-purple" id="btnSaidaColeta" onclick="abrirModalSaidaColeta()"><i class="fas fa-truck"></i> SAÍDA PARA COLETAR VALE</button>
             <button class="btn-action btn-action-info" id="btnRetornoColeta" onclick="abrirModalRetornoColeta()"><i class="fas fa-undo-alt"></i> RETORNO DE COLETA</button>
-            <button class="btn-action btn-action-success" onclick="alternarAgendaTransportadora()"><i class="fas fa-calendar-check"></i> AGENDA TRANSPORTADORA</button>
-            <button class="btn-action btn-action-secondary" onclick="exportarRelatorio()"><i class="fas fa-file-excel"></i> EXPORTAR RELATÓRIO</button>
+            <button class="btn-action btn-action-success" id="btnAgendaTransportadora" onclick="alternarAgendaTransportadora()"><i class="fas fa-calendar-check"></i> AGENDA TRANSPORTADORA</button>
+            <button class="btn-action btn-action-secondary" id="btnExportarRelatorio" onclick="exportarRelatorio()"><i class="fas fa-file-excel"></i> EXPORTAR RELATÓRIO</button>
         </div>
 
         <!-- Agenda Transportadora -->
@@ -1587,7 +1591,7 @@
                     <h3><i class="fas fa-calendar-check"></i> Agenda por Transportadora</h3>
                     <span>Agende coleta de nova carga ou descarrego, acompanhe os dias e mantenha tudo arquivado apos a baixa.</span>
                 </div>
-                <button class="btn-login" style="width:auto; min-width:190px;" onclick="abrirModalAgendaTransportadora()"><i class="fas fa-plus"></i> Novo agendamento</button>
+                <button class="btn-login" id="btnNovoAgendaTransportadora" style="width:auto; min-width:190px;" onclick="abrirModalAgendaTransportadora()"><i class="fas fa-plus"></i> Novo agendamento</button>
             </div>
             <div class="agenda-summary" id="agendaResumo"></div>
             <div class="agenda-table-wrap" id="agendaLista"></div>
@@ -1772,11 +1776,11 @@
 <div id="modalUsuarios" class="modal"><div class="modal-content"><div class="modal-header"><h2>Gerenciar Usuários</h2><span class="modal-close" onclick="fecharModal('modalUsuarios')">&times;</span></div><div class="modal-body">
     <div id="listaUsuarios"></div><hr><h3>Novo Usuário</h3>
     <div class="form-row"><div class="form-group"><label>Usuário</label><input type="text" id="novoUser"></div><div class="form-group"><label>Senha</label><input type="text" id="novaSenha"></div></div>
-    <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="novoNome"></div><div class="form-group"><label>Perfil</label><select id="novoPerfil"><option value="user">👤 Motorista</option><option value="conferente">📋 Conferente</option><option value="master">👑 Master</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="novoNome"></div><div class="form-group"><label>Perfil</label><select id="novoPerfil"><option value="user">👤 Motorista</option><option value="conferente">📋 Conferente</option><option value="encarregado">📦 Encarregado</option><option value="almoxarifado">🏭 Almoxarifado</option><option value="transportadora">🚚 Transportadora</option><option value="faturamento">🧾 Faturamento</option><option value="master">👑 Master</option></select></div></div>
     <button class="btn-login" onclick="criarUsuario()">Criar</button>
     <hr><div id="editarUsuarioPanel" style="display:none;"><h3>Editar Usuário</h3><input type="hidden" id="editUserId">
     <div class="form-row"><div class="form-group"><label>Usuário</label><input type="text" id="editUserName"></div><div class="form-group"><label>Senha</label><input type="text" id="editUserPassword"></div></div>
-    <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="editUserNome"></div><div class="form-group"><label>Perfil</label><select id="editUserPerfil"><option value="user">Motorista</option><option value="conferente">Conferente</option><option value="master">Master</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="editUserNome"></div><div class="form-group"><label>Perfil</label><select id="editUserPerfil"><option value="user">Motorista</option><option value="conferente">Conferente</option><option value="encarregado">Encarregado</option><option value="almoxarifado">Almoxarifado</option><option value="transportadora">Transportadora</option><option value="faturamento">Faturamento</option><option value="master">Master</option></select></div></div>
     <button class="btn-login" onclick="salvarEdicaoUsuario()">Salvar</button>
     <button class="btn-login" style="background:#6c757d;" onclick="cancelarEdicaoUsuario()">Cancelar</button></div>
 </div></div></div>
@@ -1822,7 +1826,11 @@ let bancoDados = {
     users: [
         { id: 1, username: "admin", password: "admin123", role: "master", nome: "Administrador Master" },
         { id: 2, username: "motorista", password: "123456", role: "user", nome: "João Motorista" },
-        { id: 3, username: "conferente", password: "123456", role: "conferente", nome: "Conferente de Cargas" }
+        { id: 3, username: "conferente", password: "123456", role: "conferente", nome: "Conferente de Cargas" },
+        { id: 4, username: "encarregado", password: "123456", role: "encarregado", nome: "Encarregado" },
+        { id: 5, username: "almoxarifado", password: "123456", role: "almoxarifado", nome: "Almoxarifado" },
+        { id: 6, username: "transportadora", password: "123456", role: "transportadora", nome: "Transportadora" },
+        { id: 7, username: "faturamento", password: "123456", role: "faturamento", nome: "Faturamento" }
     ],
     clientes: [
         { id: 1, razao: "ATACADAO S/A", cnpj: "75.315.333/0312-50", telefone: "(81) 99999-9999", endereco: "RODOVIA PE, 7KM", cidade: "JABOATÃO", uf: "PE" },
@@ -1874,6 +1882,16 @@ function garantirEstruturaBanco() {
     if (!Array.isArray(bancoDados.representantes)) bancoDados.representantes = [];
     if (!Array.isArray(bancoDados.cargas)) bancoDados.cargas = [];
     if (!Array.isArray(bancoDados.agendaTransportadora)) bancoDados.agendaTransportadora = [];
+    garantirUsuarioPadrao("encarregado", "123456", "encarregado", "Encarregado");
+    garantirUsuarioPadrao("almoxarifado", "123456", "almoxarifado", "Almoxarifado");
+    garantirUsuarioPadrao("transportadora", "123456", "transportadora", "Transportadora");
+    garantirUsuarioPadrao("faturamento", "123456", "faturamento", "Faturamento");
+}
+
+function garantirUsuarioPadrao(username, password, role, nome) {
+    if (bancoDados.users.some(u => u.username === username)) return;
+    const id = bancoDados.users.reduce((maior, u) => Math.max(maior, Number(u.id) || 0), 0) + 1;
+    bancoDados.users.push({ id, username, password, role, nome });
 }
 
 function mostrarStatusMysql(txt, ok = true) {
@@ -1961,9 +1979,19 @@ function calcularDias(ref) { if (!ref) return 0; return Math.ceil(Math.abs(new D
 function mostrarToast(msg, tipo = 'success') { const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle', warning: 'fa-triangle-exclamation' }; const toast = document.createElement('div'); toast.className = 'toast'; toast.innerHTML = `<i class="fas ${icons[tipo]}"></i> ${msg}`; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
 function getStatusBadge(s) { const b = { 'ABERTO': '<span class="badge badge-aberto">🟡 ABERTO</span>', 'CONCLUÍDO': '<span class="badge badge-concluido">✅ CONCLUÍDO</span>', 'VALE PALLETE': '<span class="badge badge-vale">🎫 VALE PALLETE</span>', 'EM COLETA': '<span class="badge badge-em-coleta">🚚 EM COLETA</span>', 'CARGA BATIDA': '<span class="badge badge-batida">CARGA BATIDA</span>' }; return b[s] || `<span class="badge badge-info">${s}</span>`; }
 function formatarCNPJ(i) { let v = i.value.replace(/\D/g, ''); if (v.length <= 14) { v = v.replace(/^(\d{2})(\d)/, '$1.$2'); v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3'); v = v.replace(/\.(\d{3})(\d)/, '.$1/$2'); v = v.replace(/(\d{4})(\d)/, '$1-$2'); i.value = v; } }
-function isMaster() { return usuarioAtual?.role === 'master'; }
-function getPerfilLabel(role) { const perfis = { master: '👑 Master', user: '👤 Motorista', conferente: '📋 Conferente' }; return perfis[role] || role; }
-function getPerfilColor(role) { const cores = { master: '#daa520', user: '#28a745', conferente: '#8b5cf6' }; return cores[role] || '#8a9dc0'; }
+function getRoleAtual() { return usuarioAtual?.role || ''; }
+function isMaster() { return getRoleAtual() === 'master'; }
+function isFaturamento() { return getRoleAtual() === 'faturamento'; }
+function isTransportadora() { return getRoleAtual() === 'transportadora'; }
+function isEncarregadoOuAlmoxarifado() { return ['encarregado', 'almoxarifado'].includes(getRoleAtual()); }
+function usuarioSomenteAgenda() { return isTransportadora() || isEncarregadoOuAlmoxarifado(); }
+function podeCadastrarBasico() { return isMaster() || isFaturamento(); }
+function podeCriarAgenda() { return isMaster() || isTransportadora(); }
+function podeBaixarAgenda() { return isMaster() || isEncarregadoOuAlmoxarifado(); }
+function podeOperarCargas() { return isMaster() || ['user', 'conferente'].includes(getRoleAtual()); }
+function podeExportarRelatorio() { return !usuarioSomenteAgenda(); }
+function getPerfilLabel(role) { const perfis = { master: '👑 Master', user: '👤 Motorista', conferente: '📋 Conferente', encarregado: '📦 Encarregado', almoxarifado: '🏭 Almoxarifado', transportadora: '🚚 Transportadora', faturamento: '🧾 Faturamento' }; return perfis[role] || role; }
+function getPerfilColor(role) { const cores = { master: '#daa520', user: '#28a745', conferente: '#8b5cf6', encarregado: '#0891b2', almoxarifado: '#0f766e', transportadora: '#2563eb', faturamento: '#b45309' }; return cores[role] || '#8a9dc0'; }
 function getTodasCargas() { return [...bancoDados.cargas]; }
 function usuarioLogadoNome() { return usuarioAtual?.nome || usuarioAtual?.username || 'Sistema'; }
 function registrarAlteracao(carga, acao, detalhes = '') {
@@ -2097,9 +2125,7 @@ function fazerLogin() {
         document.getElementById('userNameDisplay').innerText = user.nome;
         document.getElementById('userRoleDisplay').innerHTML = getPerfilLabel(user.role);
         document.getElementById('userAvatar').innerText = user.username.charAt(0).toUpperCase();
-        document.getElementById('adminBar').style.display = user.role === 'master' ? 'flex' : 'none';
-        document.getElementById('btnSaidaColeta').style.display = user.role === 'master' ? 'flex' : 'none';
-        document.getElementById('btnRetornoColeta').style.display = user.role === 'master' ? 'flex' : 'none';
+        aplicarPermissoesTela();
         carregarSelects();
         atualizarDashboard();
         atualizarTabela();
@@ -2109,6 +2135,45 @@ function fazerLogin() {
 }
 
 function fazerLogout() { usuarioAtual = null; document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none'; mostrarToast('Saiu do sistema', 'info'); }
+
+function setDisplayById(id, mostrar, display = '') {
+    const el = document.getElementById(id);
+    if (el) el.style.display = mostrar ? display : 'none';
+}
+
+function setDisplaySelector(selector, mostrar, display = '') {
+    const el = document.querySelector(selector);
+    if (el) el.style.display = mostrar ? display : 'none';
+}
+
+function aplicarPermissoesTela() {
+    const somenteAgenda = usuarioSomenteAgenda();
+    const exibeAdmin = isMaster() || isFaturamento();
+    setDisplayById('adminBar', exibeAdmin, 'flex');
+    setDisplayById('btnAdminUsuarios', isMaster());
+    setDisplayById('btnAdminCliente', podeCadastrarBasico());
+    setDisplayById('btnAdminTransportadora', podeCadastrarBasico());
+    setDisplayById('btnAdminRepresentante', podeCadastrarBasico());
+    setDisplayById('btnAdminImportar', isMaster());
+    setDisplayById('btnAdminBackup', isMaster());
+    setDisplayById('btnAdminReset', isMaster());
+
+    setDisplayById('btnNovaCarga', podeOperarCargas(), 'flex');
+    setDisplayById('btnRetornoCarga', podeOperarCargas(), 'flex');
+    setDisplayById('btnSaidaColeta', isMaster(), 'flex');
+    setDisplayById('btnRetornoColeta', isMaster(), 'flex');
+    setDisplayById('btnAgendaTransportadora', isMaster() || isTransportadora() || isEncarregadoOuAlmoxarifado(), 'flex');
+    setDisplayById('btnExportarRelatorio', podeExportarRelatorio(), 'flex');
+    setDisplayById('btnNovoAgendaTransportadora', podeCriarAgenda(), '');
+
+    setDisplaySelector('.busca-rapida', !somenteAgenda);
+    setDisplayById('dashboardGrid', !somenteAgenda);
+    setDisplaySelector('.filtros-container', !somenteAgenda);
+    setDisplaySelector('.table-container', !somenteAgenda);
+
+    const painelAgenda = document.getElementById('agendaTransportadoraPanel');
+    if (painelAgenda && somenteAgenda) painelAgenda.classList.add('active');
+}
 
 // ============================================
 // DASHBOARD
@@ -2238,6 +2303,7 @@ function atualizarDashboard() {
 // NOVA CARGA (com Motorista)
 // ============================================
 function abrirModalNovaCarga() {
+    if (!podeOperarCargas()) { mostrarToast('Acesso restrito!', 'error'); return; }
     carregarSelects(); atualizarListas();
     document.getElementById('modalNovaCarga').style.display = 'flex';
     document.querySelectorAll('#modalNovaCarga input, #modalNovaCarga select').forEach(i => { if (i.id !== 'cargaValorUnitario') i.value = ''; });
@@ -2252,6 +2318,7 @@ function abrirModalNovaCarga() {
 }
 
 function salvarNovaCarga() {
+    if (!podeOperarCargas()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const nf = document.getElementById('cargaNotaFiscal').value.trim();
     if (!nf) { mostrarToast('Nota Fiscal obrigatória!', 'error'); return; }
     if (bancoDados.cargas.some(c => c.notaFiscal === nf)) { mostrarToast('Nota Fiscal já cadastrada!', 'error'); return; }
@@ -2286,6 +2353,7 @@ function salvarNovaCarga() {
 // RETORNO DA CARGA
 // ============================================
 function abrirModalRetornoCarga() {
+    if (!podeOperarCargas()) { mostrarToast('Acesso restrito!', 'error'); return; }
     document.getElementById('modalRetornoCarga').style.display = 'flex';
     document.getElementById('buscaRetornoNF').value = '';
     document.getElementById('cargasAbertasLista').innerHTML = '';
@@ -2321,6 +2389,7 @@ function selecionarOpcaoRetorno(opcao) {
 }
 
 function confirmarRetorno() {
+    if (!podeOperarCargas()) { mostrarToast('Acesso restrito!', 'error'); return; }
     if (!cargaSelecionadaRetorno) { mostrarToast('Selecione uma carga!', 'error'); return; }
     if (!opcaoRetornoSelecionada) { mostrarToast('Selecione uma opção!', 'error'); return; }
     const dr = document.getElementById('retornoData').value;
@@ -2567,6 +2636,7 @@ function buscarCarga() {
 }
 
 function exportarRelatorio() {
+    if (!podeExportarRelatorio()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const dados = filtrosAtivos ? cargasFiltradas : getTodasCargas();
     if (!dados.length) { mostrarToast('Nenhum dado!', 'error'); return; }
     let csv = "Nota Fiscal;SAP;Cliente;CNPJ;Cidade;UF;Motorista;Placa;Transportadora;Representante;Data Carga;Data Retorno;Data Saída Coleta;Data Retorno Coleta;Status;Quantidade;Valor Total;Usuario Cadastro;Usuario Ultima Mudanca;Data Ultima Mudanca;Acao Ultima Mudanca;Historico de Mudancas\n";
@@ -2584,12 +2654,13 @@ function exportarRelatorio() {
 }
 
 // ============================================
-// CADASTROS (Master)
+// CADASTROS (Master/Faturamento)
 // ============================================
-function abrirModalCliente() { if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalCliente').style.display = 'flex'; document.querySelectorAll('#modalCliente input').forEach(i => i.value = ''); }
-function salvarCliente() { const r = document.getElementById('clienteRazao').value.trim(); const c = document.getElementById('clienteCNPJ').value.trim(); if (!r || !c) { mostrarToast('Preencha razão e CNPJ!', 'error'); return; } bancoDados.clientes.push({ id: bancoDados.clientes.length + 1, razao: r, cnpj: c, telefone: document.getElementById('clienteTelefone').value, endereco: document.getElementById('clienteEndereco').value, cidade: document.getElementById('clienteCidade').value, uf: document.getElementById('clienteUF').value.toUpperCase() }); salvarBanco(); carregarSelects(); fecharModal('modalCliente'); mostrarToast(`Cliente ${r} cadastrado!`); }
-function abrirModalTransportadora() { if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalTransportadora').style.display = 'flex'; document.querySelectorAll('#modalTransportadora input, #modalTransportadora textarea').forEach(i => i.value = ''); }
+function abrirModalCliente() { if (!podeCadastrarBasico()) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalCliente').style.display = 'flex'; document.querySelectorAll('#modalCliente input').forEach(i => i.value = ''); }
+function salvarCliente() { if (!podeCadastrarBasico()) { mostrarToast('Acesso restrito!', 'error'); return; } const r = document.getElementById('clienteRazao').value.trim(); const c = document.getElementById('clienteCNPJ').value.trim(); if (!r || !c) { mostrarToast('Preencha razão e CNPJ!', 'error'); return; } bancoDados.clientes.push({ id: bancoDados.clientes.length + 1, razao: r, cnpj: c, telefone: document.getElementById('clienteTelefone').value, endereco: document.getElementById('clienteEndereco').value, cidade: document.getElementById('clienteCidade').value, uf: document.getElementById('clienteUF').value.toUpperCase() }); salvarBanco(); carregarSelects(); fecharModal('modalCliente'); mostrarToast(`Cliente ${r} cadastrado!`); }
+function abrirModalTransportadora() { if (!podeCadastrarBasico()) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalTransportadora').style.display = 'flex'; document.querySelectorAll('#modalTransportadora input, #modalTransportadora textarea').forEach(i => i.value = ''); }
 function salvarTransportadora() {
+    if (!podeCadastrarBasico()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const n = document.getElementById('transpNome').value.trim();
     if (!n) { mostrarToast('Informe o nome!', 'error'); return; }
     const frota = [];
@@ -2605,8 +2676,8 @@ function salvarTransportadora() {
     bancoDados.transportadoras.push({ id: bancoDados.transportadoras.length + 1, nome: n, cnpj: document.getElementById('transpCNPJ').value, telefone: document.getElementById('transpTelefone').value, contato: document.getElementById('transpContato').value, frota });
     salvarBanco(); carregarSelects(); fecharModal('modalTransportadora'); mostrarToast(`Transportadora ${n} cadastrada!`);
 }
-function abrirModalRepresentante() { if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalRepresentante').style.display = 'flex'; document.querySelectorAll('#modalRepresentante input').forEach(i => i.value = ''); }
-function salvarRepresentante() { const n = document.getElementById('repNome').value.trim(); if (!n) { mostrarToast('Informe o nome!', 'error'); return; } bancoDados.representantes.push({ id: bancoDados.representantes.length + 1, nome: n, telefone: document.getElementById('repTelefone').value, email: document.getElementById('repEmail').value, regiao: document.getElementById('repRegiao').value }); salvarBanco(); carregarSelects(); fecharModal('modalRepresentante'); mostrarToast(`Representante ${n} cadastrado!`); }
+function abrirModalRepresentante() { if (!podeCadastrarBasico()) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalRepresentante').style.display = 'flex'; document.querySelectorAll('#modalRepresentante input').forEach(i => i.value = ''); }
+function salvarRepresentante() { if (!podeCadastrarBasico()) { mostrarToast('Acesso restrito!', 'error'); return; } const n = document.getElementById('repNome').value.trim(); if (!n) { mostrarToast('Informe o nome!', 'error'); return; } bancoDados.representantes.push({ id: bancoDados.representantes.length + 1, nome: n, telefone: document.getElementById('repTelefone').value, email: document.getElementById('repEmail').value, regiao: document.getElementById('repRegiao').value }); salvarBanco(); carregarSelects(); fecharModal('modalRepresentante'); mostrarToast(`Representante ${n} cadastrado!`); }
 
 // ============================================
 // AGENDA POR TRANSPORTADORA
@@ -2641,6 +2712,7 @@ function calcularDiasAgenda(item) {
 }
 
 function alternarAgendaTransportadora() {
+    if (!(isMaster() || isTransportadora() || isEncarregadoOuAlmoxarifado())) { mostrarToast('Acesso restrito!', 'error'); return; }
     const painel = document.getElementById('agendaTransportadoraPanel');
     if (!painel) return;
     painel.classList.toggle('active');
@@ -2656,6 +2728,7 @@ function atualizarCamposAgendaTransportadora() {
 }
 
 function abrirModalAgendaTransportadora() {
+    if (!podeCriarAgenda()) { mostrarToast('Acesso restrito!', 'error'); return; }
     carregarSelects();
     document.getElementById('modalAgendaTransportadora').style.display = 'flex';
     ['agendaTransportadoraNome', 'agendaMotorista', 'agendaPlaca', 'agendaQuantidade', 'agendaNotaFiscal', 'agendaCliente', 'agendaObservacoes'].forEach(id => {
@@ -2670,6 +2743,7 @@ function abrirModalAgendaTransportadora() {
 }
 
 function salvarAgendaTransportadora() {
+    if (!podeCriarAgenda()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const tipo = document.getElementById('agendaTipo').value;
     const dataAgenda = document.getElementById('agendaData').value;
     const transportadora = document.getElementById('agendaTransportadoraNome').value.trim();
@@ -2722,6 +2796,7 @@ function salvarAgendaTransportadora() {
 }
 
 function baixarAgendaTransportadora(id) {
+    if (!podeBaixarAgenda()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const item = getAgendaTransportadora().find(a => a.id === id);
     if (!item || item.status === 'BAIXADO') return;
     const obs = prompt('Observacao da baixa (opcional):') || '';
@@ -2791,7 +2866,7 @@ function atualizarAgendaTransportadora() {
                                 <td>${htmlSeguro(item.cliente || '-')}</td>
                                 <td><strong>${dias}</strong></td>
                                 <td>${item.dataBaixa ? `${formatarDataHoraAgenda(item.dataBaixa)}<br><small>${htmlSeguro(item.baixaPor || '')}</small>` : '-'}</td>
-                                <td>${item.status === 'BAIXADO' ? '<span style="color:#64748b;">Arquivado</span>' : `<button class="btn-acao btn-retorno" onclick="baixarAgendaTransportadora(${item.id})"><i class="fas fa-check"></i> Baixar</button>`}</td>
+                                <td>${item.status === 'BAIXADO' ? '<span style="color:#64748b;">Arquivado</span>' : (podeBaixarAgenda() ? `<button class="btn-acao btn-retorno" onclick="baixarAgendaTransportadora(${item.id})"><i class="fas fa-check"></i> Baixar</button>` : '<span style="color:#64748b;">Aguardando baixa</span>')}</td>
                             </tr>
                         `;
                     }).join('')}
