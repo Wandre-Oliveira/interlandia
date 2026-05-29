@@ -1493,6 +1493,46 @@
             border-radius: 8px;
         }
 
+        .agenda-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 12px;
+            padding: 14px 16px 0;
+        }
+
+        .agenda-board-section {
+            background: var(--panel-muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .agenda-board-section h4 {
+            color: var(--text);
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .agenda-board-list {
+            display: grid;
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .agenda-board-item {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .agenda-board-item strong {
+            color: var(--text);
+        }
+
         @media (max-width: 768px) {
             .main-wrapper {
                 padding: 10px;
@@ -1594,6 +1634,7 @@
                 <button class="btn-login" id="btnNovoAgendaTransportadora" style="width:auto; min-width:190px;" onclick="abrirModalAgendaTransportadora()"><i class="fas fa-plus"></i> Novo agendamento</button>
             </div>
             <div class="agenda-summary" id="agendaResumo"></div>
+            <div class="agenda-board" id="agendaBoardTransportadora"></div>
             <div class="agenda-table-wrap" id="agendaLista"></div>
         </section>
         
@@ -1868,6 +1909,7 @@ let opcaoRetornoColetaSelecionada = null;
 let cargaSelecionadaRetorno = null;
 let cargaSelecionadaSaida = null;
 let cargaSelecionadaRetornoColeta = null;
+let agendaTempoRealTimer = null;
 
 // ============================================
 // FUNÇÕES UTILITÁRIAS
@@ -2130,11 +2172,12 @@ function fazerLogin() {
         atualizarDashboard();
         atualizarTabela();
         atualizarAgendaTransportadora();
+        iniciarAgendaTempoReal();
         mostrarToast(`Bem-vindo, ${user.nome}!`);
     } else { document.getElementById('loginError').innerText = 'Usuário ou senha inválidos!'; }
 }
 
-function fazerLogout() { usuarioAtual = null; document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none'; mostrarToast('Saiu do sistema', 'info'); }
+function fazerLogout() { pararAgendaTempoReal(); usuarioAtual = null; document.getElementById('loginScreen').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none'; mostrarToast('Saiu do sistema', 'info'); }
 
 function setDisplayById(id, mostrar, display = '') {
     const el = document.getElementById(id);
@@ -2691,6 +2734,36 @@ function getAgendaTransportadora() {
     return bancoDados.agendaTransportadora;
 }
 
+function normalizarAgendaValor(v) {
+    return String(v || '').trim().toUpperCase();
+}
+
+function buscarAgendaPendenteMesmoVeiculo(motorista, placa) {
+    const m = normalizarAgendaValor(motorista);
+    const p = normalizarAgendaValor(placa);
+    if (!m || !p) return null;
+    return getAgendaTransportadora().find(item =>
+        normalizarAgendaValor(item.motorista) === m &&
+        normalizarAgendaValor(item.placa) === p &&
+        item.status !== 'BAIXADO'
+    );
+}
+
+function iniciarAgendaTempoReal() {
+    pararAgendaTempoReal();
+    if (!(isTransportadora() || isEncarregadoOuAlmoxarifado() || isMaster())) return;
+    agendaTempoRealTimer = setInterval(() => {
+        if (!usuarioAtual || !document.getElementById('agendaTransportadoraPanel')) return;
+        if (mysqlAtivo) carregarBancoMySQL();
+        else atualizarAgendaTransportadora();
+    }, 15000);
+}
+
+function pararAgendaTempoReal() {
+    if (agendaTempoRealTimer) clearInterval(agendaTempoRealTimer);
+    agendaTempoRealTimer = null;
+}
+
 function formatarDataHoraAgenda(d) {
     if (!d) return '-';
     const data = new Date(d);
@@ -2764,6 +2837,11 @@ function salvarAgendaTransportadora() {
         mostrarToast('Para descarrego, informe nota fiscal e cliente.', 'error');
         return;
     }
+    const agendaPendente = buscarAgendaPendenteMesmoVeiculo(motorista, placa);
+    if (agendaPendente) {
+        mostrarToast(`Este motorista e placa ja possuem agendamento pendente. So pode agendar novamente apos a baixa.`, 'error');
+        return;
+    }
 
     const item = {
         id: proximoId(getAgendaTransportadora()),
@@ -2813,6 +2891,7 @@ function baixarAgendaTransportadora(id) {
 function atualizarAgendaTransportadora() {
     const resumo = document.getElementById('agendaResumo');
     const lista = document.getElementById('agendaLista');
+    const board = document.getElementById('agendaBoardTransportadora');
     if (!resumo || !lista) return;
 
     const itens = getAgendaTransportadora();
@@ -2827,6 +2906,29 @@ function atualizarAgendaTransportadora() {
         <div class="agenda-summary-card"><span>Coletas</span><strong>${coletas.length}</strong></div>
         <div class="agenda-summary-card"><span>Descarregos</span><strong>${descarregos.length}</strong></div>
     `;
+
+    if (board) {
+        board.style.display = isTransportadora() ? 'grid' : 'none';
+        if (isTransportadora()) {
+            const renderItem = item => `
+                <div class="agenda-board-item">
+                    <strong>${htmlSeguro(item.placa || '-')}</strong> - ${htmlSeguro(item.motorista || '-')}<br>
+                    ${htmlSeguro(item.veiculo || '-')} | ${htmlSeguro(item.tipoCarga || '-')} | Qtde ${item.quantidade || 0}<br>
+                    <small>${formatarDataHoraAgenda(item.dataAgenda)}${item.dataBaixa ? ' | Baixa: ' + formatarDataHoraAgenda(item.dataBaixa) : ''}</small>
+                </div>
+            `;
+            board.innerHTML = `
+                <div class="agenda-board-section">
+                    <h4>Faltam dar baixa</h4>
+                    <div class="agenda-board-list">${pendentes.map(renderItem).join('') || '<div class="agenda-empty">Nenhum veiculo pendente.</div>'}</div>
+                </div>
+                <div class="agenda-board-section">
+                    <h4>Ja deram baixa</h4>
+                    <div class="agenda-board-list">${baixados.slice(0, 20).map(renderItem).join('') || '<div class="agenda-empty">Nenhum veiculo baixado.</div>'}</div>
+                </div>
+            `;
+        }
+    }
 
     if (!itens.length) {
         lista.innerHTML = '<div class="agenda-empty">Nenhum agendamento registrado.</div>';
