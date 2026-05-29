@@ -1202,6 +1202,12 @@
             border: 1px solid #a5f3fc !important;
         }
 
+        .btn-action-success {
+            background: #ecfdf3 !important;
+            color: var(--green) !important;
+            border: 1px solid #bbf7d0 !important;
+        }
+
         .btn-action-secondary,
         .btn-limpar,
         .btn-logout {
@@ -1379,6 +1385,114 @@
             color: var(--red) !important;
         }
 
+        .agenda-panel {
+            display: none;
+            background: var(--panel) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 10px;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        .agenda-panel.active {
+            display: block;
+        }
+
+        .agenda-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .agenda-header h3 {
+            color: var(--text);
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+
+        .agenda-header span {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .agenda-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 14px 16px 0;
+        }
+
+        .agenda-summary-card {
+            background: var(--panel-muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+        }
+
+        .agenda-summary-card span,
+        .agenda-summary-card small {
+            display: block;
+            color: var(--muted);
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: .05em;
+        }
+
+        .agenda-summary-card strong {
+            display: block;
+            color: var(--text);
+            font-size: 22px;
+            margin-top: 4px;
+        }
+
+        .agenda-table-wrap {
+            padding: 16px;
+            overflow-x: auto;
+        }
+
+        .agenda-table {
+            min-width: 1200px;
+        }
+
+        .agenda-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 4px 9px;
+            font-size: 10px;
+            font-weight: 800;
+            border: 1px solid var(--border);
+        }
+
+        .agenda-status.pendente {
+            background: #fff7ed;
+            color: #9a3412;
+            border-color: #fed7aa;
+        }
+
+        .agenda-status.baixado {
+            background: #ecfdf3;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .agenda-empty {
+            padding: 22px;
+            color: var(--muted);
+            text-align: center;
+            background: var(--panel-muted);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+        }
+
         @media (max-width: 768px) {
             .main-wrapper {
                 padding: 10px;
@@ -1392,6 +1506,11 @@
             .table-container,
             .stat-card {
                 border-radius: 8px !important;
+            }
+
+            .agenda-header {
+                align-items: stretch;
+                flex-direction: column;
             }
         }
     </style>
@@ -1457,8 +1576,22 @@
             <button class="btn-action btn-action-warning" onclick="abrirModalRetornoCarga()"><i class="fas fa-undo-alt"></i> RETORNO DA CARGA</button>
             <button class="btn-action btn-action-purple" id="btnSaidaColeta" onclick="abrirModalSaidaColeta()"><i class="fas fa-truck"></i> SAÍDA PARA COLETAR VALE</button>
             <button class="btn-action btn-action-info" id="btnRetornoColeta" onclick="abrirModalRetornoColeta()"><i class="fas fa-undo-alt"></i> RETORNO DE COLETA</button>
+            <button class="btn-action btn-action-success" onclick="alternarAgendaTransportadora()"><i class="fas fa-calendar-check"></i> AGENDA TRANSPORTADORA</button>
             <button class="btn-action btn-action-secondary" onclick="exportarRelatorio()"><i class="fas fa-file-excel"></i> EXPORTAR RELATÓRIO</button>
         </div>
+
+        <!-- Agenda Transportadora -->
+        <section id="agendaTransportadoraPanel" class="agenda-panel">
+            <div class="agenda-header">
+                <div>
+                    <h3><i class="fas fa-calendar-check"></i> Agenda por Transportadora</h3>
+                    <span>Agende coleta de nova carga ou descarrego, acompanhe os dias e mantenha tudo arquivado apos a baixa.</span>
+                </div>
+                <button class="btn-login" style="width:auto; min-width:190px;" onclick="abrirModalAgendaTransportadora()"><i class="fas fa-plus"></i> Novo agendamento</button>
+            </div>
+            <div class="agenda-summary" id="agendaResumo"></div>
+            <div class="agenda-table-wrap" id="agendaLista"></div>
+        </section>
         
         <!-- Busca Rápida -->
         <div class="busca-rapida">
@@ -1656,6 +1789,31 @@
     <button class="btn-login" onclick="processarImportacao()"><i class="fas fa-upload"></i> Importar Agora</button>
 </div></div></div>
 
+<div id="modalAgendaTransportadora" class="modal"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-calendar-check"></i> AGENDAR TRANSPORTADORA</h2><span class="modal-close" onclick="fecharModal('modalAgendaTransportadora')">&times;</span></div><div class="modal-body">
+    <div class="form-row">
+        <div class="form-group"><label class="required">Tipo de agenda</label><select id="agendaTipo" onchange="atualizarCamposAgendaTransportadora()"><option value="coleta">Coletar nova carga</option><option value="descarrego">Agendar descarrego</option></select></div>
+        <div class="form-group"><label class="required">Data da agenda</label><input type="datetime-local" id="agendaData"></div>
+    </div>
+    <div class="form-group"><label class="required">Transportadora</label><input type="text" id="agendaTransportadoraNome" list="listaAgendaTransportadoras" placeholder="Nome da transportadora"></div>
+    <datalist id="listaAgendaTransportadoras"></datalist>
+    <div class="form-row">
+        <div class="form-group"><label class="required">Motorista</label><input type="text" id="agendaMotorista" list="listaMotoristas" placeholder="Nome do motorista"></div>
+        <div class="form-group"><label class="required">Placa</label><input type="text" id="agendaPlaca" list="listaPlacas" placeholder="Placa do veiculo"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label class="required">Veiculo</label><select id="agendaVeiculo"><option value="Caminhao">Caminhao</option><option value="Carreta">Carreta</option><option value="Truck">Truck</option></select></div>
+        <div class="form-group"><label class="required">Tipo de carga</label><select id="agendaTipoCarga"><option value="Palete">Palete</option><option value="Carga batida">Carga batida</option><option value="Materia prima">Carga materia prima</option></select></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label class="required">Quantidade</label><input type="number" id="agendaQuantidade" min="0" step="1" placeholder="Quantidade"></div>
+        <div class="form-group agenda-campo-descarrego"><label>Nota fiscal</label><input type="text" id="agendaNotaFiscal" placeholder="Obrigatorio para descarrego"></div>
+    </div>
+    <div class="form-group agenda-campo-descarrego"><label>Cliente</label><input type="text" id="agendaCliente" list="listaAgendaClientes" placeholder="Obrigatorio para descarrego"></div>
+    <datalist id="listaAgendaClientes"></datalist>
+    <div class="form-group"><label>Observacoes</label><textarea id="agendaObservacoes" rows="2" placeholder="Detalhes de janela, doca, contato ou prioridade"></textarea></div>
+    <button class="btn-login" onclick="salvarAgendaTransportadora()"><i class="fas fa-save"></i> Salvar agendamento</button>
+</div></div></div>
+
 <script>
 // ============================================
 // BANCO DE DADOS LOCAL
@@ -1687,7 +1845,8 @@ let bancoDados = {
         { id: 3, notaFiscal: "NF-2025003", sap: "1074", clienteId: 3, clienteNome: "MATEUS SUPERMERCADOS LTDA", cnpj: "12.345.678/0001-90", endereco: "AVENIDA CENTRAL, 100", uf: "PE", representanteId: 1, representanteNome: "DIOGO DANTAS", transportadoraId: 1, transportadoraNome: "INTERLANDIA", tipo: "paletizada", qtde: 28, valorUnitario: 120, valorTotal: 3360, motorista: "WAGNER", placa: "KIK-3022", dataCarga: new Date(Date.now() - 45*24*60*60*1000).toISOString(), dataRetorno: null, dataSaidaColeta: null, dataRetornoColeta: null, status: "ABERTO", observacoes: "", motivoVale: "", motivoNaoColetado: "" },
         { id: 4, notaFiscal: "NF-2025004", sap: "1050", clienteId: 4, clienteNome: "SUPERMERCADO DA FAMILIA", cnpj: "98.765.432/0001-10", endereco: "RUA DAS FLORES, 50", uf: "PE", representanteId: 2, representanteNome: "MARCOS ALVES", transportadoraId: 1, transportadoraNome: "INTERLANDIA", tipo: "nao_paletizada", qtde: 16, valorUnitario: 100, valorTotal: 1600, motorista: "ROBERTO", placa: "ROB-1234", dataCarga: new Date(Date.now() - 20*24*60*60*1000).toISOString(), dataRetorno: null, dataSaidaColeta: null, dataRetornoColeta: null, status: "ABERTO", observacoes: "", motivoVale: "", motivoNaoColetado: "" },
         { id: 5, notaFiscal: "NF-2025005", sap: "1066", clienteId: 1, clienteNome: "ATACADAO S/A", cnpj: "75.315.333/0312-50", endereco: "RODOVIA PE, 7KM", uf: "PE", representanteId: 1, representanteNome: "DIOGO DANTAS", transportadoraId: 2, transportadoraNome: "WELLITON", tipo: "paletizada", qtde: 56, valorUnitario: 150, valorTotal: 8400, motorista: "EDUARDO", placa: "EDU-5678", dataCarga: new Date(Date.now() - 12*24*60*60*1000).toISOString(), dataRetorno: new Date(Date.now() - 8*24*60*60*1000).toISOString(), dataSaidaColeta: null, dataRetornoColeta: null, status: "CONCLUÍDO", observacoes: "", motivoVale: "", motivoNaoColetado: "" }
-    ]
+    ],
+    agendaTransportadora: []
 };
 
 const bancoDadosPadrao = JSON.parse(JSON.stringify(bancoDados));
@@ -1708,6 +1867,15 @@ let cargaSelecionadaRetornoColeta = null;
 let mysqlAtivo = false;
 let salvandoMysql = false;
 
+function garantirEstruturaBanco() {
+    if (!Array.isArray(bancoDados.users)) bancoDados.users = [];
+    if (!Array.isArray(bancoDados.clientes)) bancoDados.clientes = [];
+    if (!Array.isArray(bancoDados.transportadoras)) bancoDados.transportadoras = [];
+    if (!Array.isArray(bancoDados.representantes)) bancoDados.representantes = [];
+    if (!Array.isArray(bancoDados.cargas)) bancoDados.cargas = [];
+    if (!Array.isArray(bancoDados.agendaTransportadora)) bancoDados.agendaTransportadora = [];
+}
+
 function mostrarStatusMysql(txt, ok = true) {
     const el = document.getElementById('mysqlStatus');
     if (el) {
@@ -1717,9 +1885,11 @@ function mostrarStatusMysql(txt, ok = true) {
 }
 
 function salvarBanco() {
+    garantirEstruturaBanco();
     bancoDados.ultimaAtualizacao = new Date().toISOString();
     localStorage.setItem("interlandia_estoque", JSON.stringify(bancoDados));
     atualizarListas();
+    if (typeof atualizarAgendaTransportadora === 'function') atualizarAgendaTransportadora();
     salvarBancoMySQL();
 }
 
@@ -1728,6 +1898,7 @@ function carregarBanco() {
     if (saved) {
         try { bancoDados = JSON.parse(saved); } catch(e) {}
     }
+    garantirEstruturaBanco();
     atualizarListas();
 }
 
@@ -1738,12 +1909,14 @@ async function carregarBancoMySQL() {
         const json = await resp.json();
         if (json.ok && json.dados) {
             bancoDados = json.dados;
+            garantirEstruturaBanco();
             localStorage.setItem("interlandia_estoque", JSON.stringify(bancoDados));
             mysqlAtivo = true;
             atualizarListas();
             if (typeof carregarSelects === 'function') carregarSelects();
             if (typeof atualizarDashboard === 'function') atualizarDashboard();
             if (typeof atualizarTabela === 'function') atualizarTabela();
+            if (typeof atualizarAgendaTransportadora === 'function') atualizarAgendaTransportadora();
             mostrarStatusMysql('MySQL conectado');
         } else {
             mysqlAtivo = true;
@@ -1906,6 +2079,8 @@ function carregarSelects() {
     const fu = document.getElementById('filtroUF'); if (fu) { fu.innerHTML = '<option>Todos os estados</option>'; ufs.forEach(uf => { fu.innerHTML += `<option value="${uf}">${uf}</option>`; }); }
     const cidades = [...new Set(getTodasCargas().map(getCidadeCarga).concat(clientes.map(c => c.cidade)).filter(c => c))].sort();
     const fcid = document.getElementById('filtroCidade'); if (fcid) { fcid.innerHTML = '<option>Todas as cidades</option>'; cidades.forEach(cidade => { fcid.innerHTML += `<option value="${cidade}">${cidade}</option>`; }); }
+    const agendaTransp = document.getElementById('listaAgendaTransportadoras'); if (agendaTransp) agendaTransp.innerHTML = bancoDados.transportadoras.map(tp => `<option value="${tp.nome}">`).join('');
+    const agendaClientes = document.getElementById('listaAgendaClientes'); if (agendaClientes) agendaClientes.innerHTML = bancoDados.clientes.map(c => `<option value="${c.razao}">`).join('');
 }
 
 // ============================================
@@ -1928,6 +2103,7 @@ function fazerLogin() {
         carregarSelects();
         atualizarDashboard();
         atualizarTabela();
+        atualizarAgendaTransportadora();
         mostrarToast(`Bem-vindo, ${user.nome}!`);
     } else { document.getElementById('loginError').innerText = 'Usuário ou senha inválidos!'; }
 }
@@ -2433,6 +2609,199 @@ function abrirModalRepresentante() { if (!isMaster()) { mostrarToast('Acesso res
 function salvarRepresentante() { const n = document.getElementById('repNome').value.trim(); if (!n) { mostrarToast('Informe o nome!', 'error'); return; } bancoDados.representantes.push({ id: bancoDados.representantes.length + 1, nome: n, telefone: document.getElementById('repTelefone').value, email: document.getElementById('repEmail').value, regiao: document.getElementById('repRegiao').value }); salvarBanco(); carregarSelects(); fecharModal('modalRepresentante'); mostrarToast(`Representante ${n} cadastrado!`); }
 
 // ============================================
+// AGENDA POR TRANSPORTADORA
+// ============================================
+function htmlSeguro(v) {
+    return String(v ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+function getAgendaTransportadora() {
+    garantirEstruturaBanco();
+    return bancoDados.agendaTransportadora;
+}
+
+function formatarDataHoraAgenda(d) {
+    if (!d) return '-';
+    const data = new Date(d);
+    if (Number.isNaN(data.getTime())) return '-';
+    return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function formatarDataInputAgenda(data = new Date()) {
+    const local = new Date(data.getTime() - data.getTimezoneOffset() * 60000);
+    return local.toISOString().slice(0, 16);
+}
+
+function calcularDiasAgenda(item) {
+    if (!item?.dataAgenda) return 0;
+    const inicio = new Date(item.dataAgenda);
+    const fim = item.dataBaixa ? new Date(item.dataBaixa) : new Date();
+    if (Number.isNaN(inicio.getTime()) || Number.isNaN(fim.getTime())) return 0;
+    return Math.max(0, Math.ceil((fim - inicio) / (1000 * 60 * 60 * 24)));
+}
+
+function alternarAgendaTransportadora() {
+    const painel = document.getElementById('agendaTransportadoraPanel');
+    if (!painel) return;
+    painel.classList.toggle('active');
+    atualizarAgendaTransportadora();
+    if (painel.classList.contains('active')) painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function atualizarCamposAgendaTransportadora() {
+    const tipo = document.getElementById('agendaTipo')?.value;
+    document.querySelectorAll('.agenda-campo-descarrego').forEach(el => {
+        el.style.display = tipo === 'descarrego' ? 'block' : 'none';
+    });
+}
+
+function abrirModalAgendaTransportadora() {
+    carregarSelects();
+    document.getElementById('modalAgendaTransportadora').style.display = 'flex';
+    ['agendaTransportadoraNome', 'agendaMotorista', 'agendaPlaca', 'agendaQuantidade', 'agendaNotaFiscal', 'agendaCliente', 'agendaObservacoes'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    document.getElementById('agendaTipo').value = 'coleta';
+    document.getElementById('agendaVeiculo').value = 'Caminhao';
+    document.getElementById('agendaTipoCarga').value = 'Palete';
+    document.getElementById('agendaData').value = formatarDataInputAgenda();
+    atualizarCamposAgendaTransportadora();
+}
+
+function salvarAgendaTransportadora() {
+    const tipo = document.getElementById('agendaTipo').value;
+    const dataAgenda = document.getElementById('agendaData').value;
+    const transportadora = document.getElementById('agendaTransportadoraNome').value.trim();
+    const motorista = document.getElementById('agendaMotorista').value.trim();
+    const placa = document.getElementById('agendaPlaca').value.trim().toUpperCase();
+    const veiculo = document.getElementById('agendaVeiculo').value;
+    const tipoCarga = document.getElementById('agendaTipoCarga').value;
+    const quantidade = parseInt(document.getElementById('agendaQuantidade').value) || 0;
+    const notaFiscal = document.getElementById('agendaNotaFiscal').value.trim();
+    const cliente = document.getElementById('agendaCliente').value.trim();
+    const observacoes = document.getElementById('agendaObservacoes').value.trim();
+
+    if (!dataAgenda || !transportadora || !motorista || !placa || !quantidade) {
+        mostrarToast('Preencha data, transportadora, motorista, placa e quantidade.', 'error');
+        return;
+    }
+    if (tipo === 'descarrego' && (!notaFiscal || !cliente)) {
+        mostrarToast('Para descarrego, informe nota fiscal e cliente.', 'error');
+        return;
+    }
+
+    const item = {
+        id: proximoId(getAgendaTransportadora()),
+        tipo,
+        dataAgenda: new Date(dataAgenda).toISOString(),
+        transportadora,
+        motorista,
+        placa,
+        veiculo,
+        tipoCarga,
+        quantidade,
+        notaFiscal: tipo === 'descarrego' ? notaFiscal : '',
+        cliente: tipo === 'descarrego' ? cliente : '',
+        observacoes,
+        status: 'PENDENTE',
+        dataBaixa: null,
+        diasBaixa: null,
+        criadoEm: new Date().toISOString(),
+        criadoPor: usuarioLogadoNome(),
+        baixaPor: '',
+        observacaoBaixa: ''
+    };
+
+    bancoDados.agendaTransportadora.push(item);
+    salvarBanco();
+    fecharModal('modalAgendaTransportadora');
+    document.getElementById('agendaTransportadoraPanel')?.classList.add('active');
+    atualizarAgendaTransportadora();
+    mostrarToast('Agendamento salvo!');
+}
+
+function baixarAgendaTransportadora(id) {
+    const item = getAgendaTransportadora().find(a => a.id === id);
+    if (!item || item.status === 'BAIXADO') return;
+    const obs = prompt('Observacao da baixa (opcional):') || '';
+    item.status = 'BAIXADO';
+    item.dataBaixa = new Date().toISOString();
+    item.diasBaixa = calcularDiasAgenda(item);
+    item.baixaPor = usuarioLogadoNome();
+    item.observacaoBaixa = obs.trim();
+    salvarBanco();
+    atualizarAgendaTransportadora();
+    mostrarToast(`Baixa registrada em ${item.diasBaixa} dia(s).`);
+}
+
+function atualizarAgendaTransportadora() {
+    const resumo = document.getElementById('agendaResumo');
+    const lista = document.getElementById('agendaLista');
+    if (!resumo || !lista) return;
+
+    const itens = getAgendaTransportadora();
+    const pendentes = itens.filter(i => i.status !== 'BAIXADO');
+    const baixados = itens.filter(i => i.status === 'BAIXADO');
+    const descarregos = itens.filter(i => i.tipo === 'descarrego');
+    const coletas = itens.filter(i => i.tipo === 'coleta');
+
+    resumo.innerHTML = `
+        <div class="agenda-summary-card"><span>Pendentes</span><strong>${pendentes.length}</strong></div>
+        <div class="agenda-summary-card"><span>Baixados</span><strong>${baixados.length}</strong></div>
+        <div class="agenda-summary-card"><span>Coletas</span><strong>${coletas.length}</strong></div>
+        <div class="agenda-summary-card"><span>Descarregos</span><strong>${descarregos.length}</strong></div>
+    `;
+
+    if (!itens.length) {
+        lista.innerHTML = '<div class="agenda-empty">Nenhum agendamento registrado.</div>';
+        return;
+    }
+
+    const ordenados = [...itens].sort((a, b) => {
+        if (a.status !== b.status) return a.status === 'PENDENTE' ? -1 : 1;
+        return new Date(b.dataAgenda) - new Date(a.dataAgenda);
+    });
+
+    lista.innerHTML = `
+        <div class="agenda-table-wrap">
+            <table class="agenda-table">
+                <thead>
+                    <tr>
+                        <th>Status</th><th>Agenda</th><th>Tipo</th><th>Transportadora</th><th>Motorista</th>
+                        <th>Placa/Veiculo</th><th>Carga</th><th>Qtde</th><th>NF</th><th>Cliente</th>
+                        <th>Dias</th><th>Baixa</th><th>Acoes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${ordenados.map(item => {
+                        const dias = item.status === 'BAIXADO' ? (item.diasBaixa ?? calcularDiasAgenda(item)) : calcularDiasAgenda(item);
+                        const statusClass = item.status === 'BAIXADO' ? 'baixado' : 'pendente';
+                        return `
+                            <tr>
+                                <td><span class="agenda-status ${statusClass}">${item.status === 'BAIXADO' ? 'Baixado' : 'Pendente'}</span></td>
+                                <td>${formatarDataHoraAgenda(item.dataAgenda)}</td>
+                                <td>${item.tipo === 'descarrego' ? 'Descarrego' : 'Coleta'}</td>
+                                <td>${htmlSeguro(item.transportadora)}</td>
+                                <td>${htmlSeguro(item.motorista)}</td>
+                                <td><strong>${htmlSeguro(item.placa)}</strong><br><small>${htmlSeguro(item.veiculo)}</small></td>
+                                <td>${htmlSeguro(item.tipoCarga)}</td>
+                                <td>${item.quantidade || 0}</td>
+                                <td>${htmlSeguro(item.notaFiscal || '-')}</td>
+                                <td>${htmlSeguro(item.cliente || '-')}</td>
+                                <td><strong>${dias}</strong></td>
+                                <td>${item.dataBaixa ? `${formatarDataHoraAgenda(item.dataBaixa)}<br><small>${htmlSeguro(item.baixaPor || '')}</small>` : '-'}</td>
+                                <td>${item.status === 'BAIXADO' ? '<span style="color:#64748b;">Arquivado</span>' : `<button class="btn-acao btn-retorno" onclick="baixarAgendaTransportadora(${item.id})"><i class="fas fa-check"></i> Baixar</button>`}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// ============================================
 // USUÁRIOS
 // ============================================
 function abrirModalUsuarios() { if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; } atualizarListaUsuarios(); document.getElementById('modalUsuarios').style.display = 'flex'; }
@@ -2545,6 +2914,7 @@ carregarSelects();
 atualizarDashboard();
 atualizarTabela();
 atualizarListas();
+atualizarAgendaTransportadora();
 </script>
 </body>
 </html>
