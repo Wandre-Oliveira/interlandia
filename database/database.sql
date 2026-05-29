@@ -14,3 +14,4 @@ INSERT INTO usuarios(tenant_id,nome,username,password_hash,role,ativo) VALUES
 INSERT INTO clientes(tenant_id,razao,cnpj,cidade,uf) VALUES(1,'ATACADAO S/A','75.315.333/0312-50','JABOATÃO','PE'),(1,'SENDAS DISTRIBUIDORA S/A','06.057.223/0519-90','RECIFE','PE');
 INSERT INTO transportadoras(tenant_id,nome,contato) VALUES(1,'INTERLANDIA','Operação'),(1,'WELLITON','Wellington');
 INSERT INTO representantes(tenant_id,nome,regiao) VALUES(1,'DIOGO DANTAS','Nordeste'),(1,'MARCOS ALVES','Nordeste');
+CREATE TABLE IF NOT EXISTS app_sync_state(id TINYINT UNSIGNED NOT NULL PRIMARY KEY, dados LONGTEXT NOT NULL, atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP);
