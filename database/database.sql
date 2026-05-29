@@ -1,0 +1,16 @@
+CREATE DATABASE IF NOT EXISTS interlandia_saas CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE interlandia_saas;
+CREATE TABLE tenants(id INT AUTO_INCREMENT PRIMARY KEY, nome VARCHAR(160) NOT NULL, cnpj VARCHAR(30), ativo TINYINT DEFAULT 1, criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+CREATE TABLE usuarios(id INT AUTO_INCREMENT PRIMARY KEY, tenant_id INT NOT NULL, nome VARCHAR(120), username VARCHAR(80) NOT NULL, password_hash VARCHAR(255) NOT NULL, role ENUM('master','motorista','conferente') DEFAULT 'conferente', ativo TINYINT DEFAULT 1, criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, UNIQUE KEY uq_user_tenant(username,tenant_id), FOREIGN KEY(tenant_id) REFERENCES tenants(id));
+CREATE TABLE clientes(id INT AUTO_INCREMENT PRIMARY KEY, tenant_id INT NOT NULL, razao VARCHAR(180), cnpj VARCHAR(30), telefone VARCHAR(40), endereco VARCHAR(255), cidade VARCHAR(100), uf VARCHAR(2), criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(tenant_id) REFERENCES tenants(id));
+CREATE TABLE transportadoras(id INT AUTO_INCREMENT PRIMARY KEY, tenant_id INT NOT NULL, nome VARCHAR(150), cnpj VARCHAR(30), telefone VARCHAR(40), contato VARCHAR(100), criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(tenant_id) REFERENCES tenants(id));
+CREATE TABLE representantes(id INT AUTO_INCREMENT PRIMARY KEY, tenant_id INT NOT NULL, nome VARCHAR(150), telefone VARCHAR(40), email VARCHAR(120), regiao VARCHAR(80), criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(tenant_id) REFERENCES tenants(id));
+CREATE TABLE cargas(id INT AUTO_INCREMENT PRIMARY KEY, tenant_id INT NOT NULL, nota_fiscal VARCHAR(80) NOT NULL, sap VARCHAR(80), cliente_nome VARCHAR(180), cnpj VARCHAR(30), uf VARCHAR(2), endereco VARCHAR(255), motorista VARCHAR(120), placa VARCHAR(20), transportadora_nome VARCHAR(150), representante_nome VARCHAR(150), tipo VARCHAR(40), qtde INT DEFAULT 0, marcar_c TINYINT DEFAULT 0, valor_unitario DECIMAL(12,2) DEFAULT 0, valor_total DECIMAL(12,2) DEFAULT 0, status ENUM('ABERTO','CONCLUÍDO','VALE PALLETE','EM COLETA') DEFAULT 'ABERTO', data_carga DATE, data_retorno DATE NULL, data_saida_coleta DATE NULL, data_retorno_coleta DATE NULL, motivo_vale TEXT, motivo_nao_coletado TEXT, observacoes TEXT, criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY(tenant_id) REFERENCES tenants(id), INDEX idx_tenant_status(tenant_id,status), INDEX idx_motorista_status(tenant_id,motorista,status));
+INSERT INTO tenants(id,nome,cnpj) VALUES(1,'INTERLANDIA LTDA','') ON DUPLICATE KEY UPDATE nome=VALUES(nome);
+INSERT INTO usuarios(tenant_id,nome,username,password_hash,role,ativo) VALUES
+(1,'Administrador Master','admin','$2y$10$c0RMAMlB9uMddSEs2xD/JOpCXFz3qSNrBRvS9WZtSEVNnMK5iQ7cC','master',1),
+(1,'Conferente Padrão','conferente','$2y$10$c0RMAMlB9uMddSEs2xD/JOpCXFz3qSNrBRvS9WZtSEVNnMK5iQ7cC','conferente',1),
+(1,'Motorista Padrão','motorista','$2y$10$c0RMAMlB9uMddSEs2xD/JOpCXFz3qSNrBRvS9WZtSEVNnMK5iQ7cC','motorista',1);
+INSERT INTO clientes(tenant_id,razao,cnpj,cidade,uf) VALUES(1,'ATACADAO S/A','75.315.333/0312-50','JABOATÃO','PE'),(1,'SENDAS DISTRIBUIDORA S/A','06.057.223/0519-90','RECIFE','PE');
+INSERT INTO transportadoras(tenant_id,nome,contato) VALUES(1,'INTERLANDIA','Operação'),(1,'WELLITON','Wellington');
+INSERT INTO representantes(tenant_id,nome,regiao) VALUES(1,'DIOGO DANTAS','Nordeste'),(1,'MARCOS ALVES','Nordeste');

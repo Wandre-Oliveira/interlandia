@@ -1,0 +1,52 @@
+name: Deploy Hostinger FTP
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gerar configuracao de producao
+        env:
+          APP_DB_HOST: ${{ secrets.DB_HOST }}
+          APP_DB_NAME: ${{ secrets.DB_NAME }}
+          APP_DB_USER: ${{ secrets.DB_USER }}
+          APP_DB_PASS: ${{ secrets.DB_PASS }}
+          APP_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: |
+          node <<'NODE' > config/production.php
+          const values = {
+            DB_HOST: process.env.APP_DB_HOST,
+            DB_NAME: process.env.APP_DB_NAME,
+            DB_USER: process.env.APP_DB_USER,
+            DB_PASS: process.env.APP_DB_PASS,
+            JWT_SECRET: process.env.APP_JWT_SECRET,
+          };
+          const phpString = (value) => `'${String(value ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+          console.log('<?php');
+          for (const [name, value] of Object.entries(values)) {
+            console.log(`define('${name}', ${phpString(value)});`);
+          }
+          NODE
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: ${{ secrets.FTP_SERVER_DIR || '/public_html/' }}
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.github/**
+            **/deploy/**
+            **/database/**
+            README_INSTALACAO_HOSTINGER.txt
+            config/local.example.php

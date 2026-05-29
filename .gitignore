@@ -1,0 +1,8 @@
+config/local.php
+config/production.php
+deploy/
+uploads/*
+!uploads/.gitkeep
+.ftp-deploy-sync-state.json
+.DS_Store
+Thumbs.db
