@@ -1,5 +1,7 @@
 config/local.php
 config/production.php
+install_import_*.php
+.codex_tmp/
 deploy/
 uploads/*
 !uploads/.gitkeep

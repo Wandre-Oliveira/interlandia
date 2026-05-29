@@ -1,7 +1,7 @@
 INTERLANDIA LTDA - SaaS Profissional PHP + MySQL + JWT
 
 DOMINIO:
-https://interladia.infinityfreeapp.com
+https://interlandia.infinityfreeapp.com
 
 LOGIN PADRAO:
 admin / admin123
