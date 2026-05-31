@@ -1836,7 +1836,7 @@
 
 <div id="modalAgendaTransportadora" class="modal"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-calendar-check"></i> AGENDAR TRANSPORTADORA</h2><span class="modal-close" onclick="fecharModal('modalAgendaTransportadora')">&times;</span></div><div class="modal-body">
     <div class="form-row">
-        <div class="form-group"><label class="required">Tipo de agenda</label><select id="agendaTipo" onchange="atualizarCamposAgendaTransportadora()"><option value="coleta">Coletar nova carga</option><option value="descarrego">Agendar descarrego</option></select></div>
+        <div class="form-group"><label class="required">Tipo de agenda</label><select id="agendaTipo" onchange="atualizarCamposAgendaTransportadora()"><option value="coleta">NOVA CARGA</option><option value="descarrego">Agendar descarrego</option></select></div>
         <div class="form-group"><label class="required">Data da agenda</label><input type="datetime-local" id="agendaData"></div>
     </div>
     <div class="form-group"><label class="required">Transportadora</label><input type="text" id="agendaTransportadoraNome" list="listaAgendaTransportadoras" placeholder="Nome da transportadora"></div>
@@ -1851,9 +1851,9 @@
     </div>
     <div class="form-row">
         <div class="form-group"><label class="required">Quantidade</label><input type="number" id="agendaQuantidade" min="0" step="1" placeholder="Quantidade"></div>
-        <div class="form-group agenda-campo-descarrego"><label>Nota fiscal</label><input type="text" id="agendaNotaFiscal" placeholder="Obrigatorio para descarrego"></div>
+        <div class="form-group"><label id="agendaNotaFiscalLabel">Nota fiscal</label><input type="text" id="agendaNotaFiscal" placeholder="Obrigatoria na baixa da NOVA CARGA"></div>
     </div>
-    <div class="form-group agenda-campo-descarrego"><label>Cliente</label><input type="text" id="agendaCliente" list="listaAgendaClientes" placeholder="Obrigatorio para descarrego"></div>
+    <div class="form-group"><label class="required" id="agendaClienteLabel">Cliente</label><input type="text" id="agendaCliente" list="listaAgendaClientes" placeholder="Cliente que vai fazer a coleta"></div>
     <datalist id="listaAgendaClientes"></datalist>
     <div class="form-group"><label>Observacoes</label><textarea id="agendaObservacoes" rows="2" placeholder="Detalhes de janela, doca, contato ou prioridade"></textarea></div>
     <button class="btn-login" onclick="salvarAgendaTransportadora()"><i class="fas fa-save"></i> Salvar agendamento</button>
@@ -2027,6 +2027,7 @@ function isFaturamento() { return getRoleAtual() === 'faturamento'; }
 function isTransportadora() { return getRoleAtual() === 'transportadora'; }
 function isEncarregadoOuAlmoxarifado() { return ['encarregado', 'almoxarifado'].includes(getRoleAtual()); }
 function usuarioSomenteAgenda() { return isTransportadora() || isEncarregadoOuAlmoxarifado(); }
+function podeVerAgenda() { return !!usuarioAtual; }
 function podeCadastrarBasico() { return isMaster() || isFaturamento(); }
 function podeCriarAgenda() { return isMaster() || isTransportadora(); }
 function podeBaixarAgenda() { return isMaster() || isEncarregadoOuAlmoxarifado(); }
@@ -2205,14 +2206,14 @@ function aplicarPermissoesTela() {
     setDisplayById('btnRetornoCarga', podeOperarCargas(), 'flex');
     setDisplayById('btnSaidaColeta', isMaster(), 'flex');
     setDisplayById('btnRetornoColeta', isMaster(), 'flex');
-    setDisplayById('btnAgendaTransportadora', isMaster() || isTransportadora() || isEncarregadoOuAlmoxarifado(), 'flex');
+    setDisplayById('btnAgendaTransportadora', podeVerAgenda(), 'flex');
     setDisplayById('btnExportarRelatorio', podeExportarRelatorio(), 'flex');
     setDisplayById('btnNovoAgendaTransportadora', podeCriarAgenda(), '');
 
     setDisplaySelector('.busca-rapida', !somenteAgenda);
     setDisplayById('dashboardGrid', !somenteAgenda);
     setDisplaySelector('.filtros-container', !somenteAgenda);
-    setDisplaySelector('.table-container', !somenteAgenda);
+    setDisplaySelector('.table-container', true);
 
     const painelAgenda = document.getElementById('agendaTransportadoraPanel');
     if (painelAgenda && somenteAgenda) painelAgenda.classList.add('active');
@@ -2365,6 +2366,7 @@ function salvarNovaCarga() {
     const nf = document.getElementById('cargaNotaFiscal').value.trim();
     if (!nf) { mostrarToast('Nota Fiscal obrigatória!', 'error'); return; }
     if (bancoDados.cargas.some(c => c.notaFiscal === nf)) { mostrarToast('Nota Fiscal já cadastrada!', 'error'); return; }
+    if (notaFiscalJaUsada(nf)) { mostrarToast('Nota Fiscal ja cadastrada em outra carga ou agendamento!', 'error'); return; }
     const motorista = document.getElementById('cargaMotorista').value.trim();
     const placa = document.getElementById('cargaPlaca').value.trim();
     if (!motorista || !placa) { mostrarToast('Motorista e Placa obrigatórios!', 'error'); return; }
@@ -2550,6 +2552,7 @@ function salvarEdicaoCarga() {
     const nf = document.getElementById('editNotaFiscal').value.trim();
     if (!nf) { mostrarToast('Nota Fiscal obrigatória!', 'error'); return; }
     if (bancoDados.cargas.some(c => c.notaFiscal === nf && c.id !== id)) { mostrarToast('Nota Fiscal já existe!', 'error'); return; }
+    if (notaFiscalJaUsada(nf, carga.agendaTransportadoraId || null, id)) { mostrarToast('Nota Fiscal ja existe em outra carga ou agendamento!', 'error'); return; }
     const sc = document.getElementById('editClienteSelect'); const cn = document.getElementById('editClienteNovo').value.trim();
     const antes = JSON.stringify(carga);
     let cnome = '', cid = null, ccnpj = '', cuf = '', cend = '', ccidade = '';
@@ -2620,7 +2623,7 @@ function atualizarTabela() {
         row.insertCell(17).innerHTML = formatarMoeda(c.valorTotal);
         const acoes = row.insertCell(18);
         let bt = `<div style="display:flex; gap:3px; flex-wrap:wrap;">`;
-        if (c.status === 'ABERTO') bt += `<button class="btn-acao btn-retorno" onclick="event.stopPropagation(); abrirModalRetornoCarga(); document.getElementById('buscaRetornoNF').value='${c.notaFiscal}'; buscarCargaParaRetorno();"><i class="fas fa-undo-alt"></i> Ret</button>`;
+        if (c.status === 'ABERTO' && podeOperarCargas()) bt += `<button class="btn-acao btn-retorno" onclick="event.stopPropagation(); abrirModalRetornoCarga(); document.getElementById('buscaRetornoNF').value='${c.notaFiscal}'; buscarCargaParaRetorno();"><i class="fas fa-undo-alt"></i> Ret</button>`;
         if (c.status === 'VALE PALLETE' && isMaster()) bt += `<button class="btn-acao btn-saida-coleta" onclick="event.stopPropagation(); abrirModalSaidaColeta(); document.getElementById('buscaSaidaNF').value='${c.sap || c.notaFiscal}'; buscarValeParaSaida();"><i class="fas fa-truck"></i> Sair</button>`;
         if (c.status === 'EM COLETA' && isMaster()) bt += `<button class="btn-acao btn-retorno-coleta" onclick="event.stopPropagation(); abrirModalRetornoColeta(); document.getElementById('buscaRetornoNFColeta').value='${c.sap || c.notaFiscal}'; buscarEmColetaParaRetorno();"><i class="fas fa-undo-alt"></i> Ret</button>`;
         if (isMaster()) bt += `<button class="btn-acao btn-editar" onclick="event.stopPropagation(); abrirEdicaoCarga(${JSON.stringify(c).replace(/"/g, '&quot;')});"><i class="fas fa-edit"></i> Editar</button>`;
@@ -2738,6 +2741,20 @@ function normalizarAgendaValor(v) {
     return String(v || '').trim().toUpperCase();
 }
 
+function notaFiscalJaUsada(notaFiscal, agendaIgnorarId = null, cargaIgnorarId = null) {
+    const nf = normalizarAgendaValor(notaFiscal);
+    if (!nf) return false;
+    const existeNaCarga = bancoDados.cargas.some(c =>
+        normalizarAgendaValor(c.notaFiscal) === nf &&
+        (cargaIgnorarId === null || Number(c.id) !== Number(cargaIgnorarId))
+    );
+    const existeNaAgenda = getAgendaTransportadora().some(a =>
+        normalizarAgendaValor(a.notaFiscal) === nf &&
+        (agendaIgnorarId === null || Number(a.id) !== Number(agendaIgnorarId))
+    );
+    return existeNaCarga || existeNaAgenda;
+}
+
 function buscarAgendaPendenteMesmoVeiculo(motorista, placa) {
     const m = normalizarAgendaValor(motorista);
     const p = normalizarAgendaValor(placa);
@@ -2751,7 +2768,7 @@ function buscarAgendaPendenteMesmoVeiculo(motorista, placa) {
 
 function iniciarAgendaTempoReal() {
     pararAgendaTempoReal();
-    if (!(isTransportadora() || isEncarregadoOuAlmoxarifado() || isMaster())) return;
+    if (!podeVerAgenda()) return;
     agendaTempoRealTimer = setInterval(() => {
         if (!usuarioAtual || !document.getElementById('agendaTransportadoraPanel')) return;
         if (mysqlAtivo) carregarBancoMySQL();
@@ -2785,7 +2802,7 @@ function calcularDiasAgenda(item) {
 }
 
 function alternarAgendaTransportadora() {
-    if (!(isMaster() || isTransportadora() || isEncarregadoOuAlmoxarifado())) { mostrarToast('Acesso restrito!', 'error'); return; }
+    if (!podeVerAgenda()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const painel = document.getElementById('agendaTransportadoraPanel');
     if (!painel) return;
     painel.classList.toggle('active');
@@ -2795,9 +2812,12 @@ function alternarAgendaTransportadora() {
 
 function atualizarCamposAgendaTransportadora() {
     const tipo = document.getElementById('agendaTipo')?.value;
-    document.querySelectorAll('.agenda-campo-descarrego').forEach(el => {
-        el.style.display = tipo === 'descarrego' ? 'block' : 'none';
-    });
+    const nf = document.getElementById('agendaNotaFiscal');
+    const nfLabel = document.getElementById('agendaNotaFiscalLabel');
+    const cliente = document.getElementById('agendaCliente');
+    if (nf) nf.placeholder = tipo === 'descarrego' ? 'Obrigatoria para descarrego' : 'Obrigatoria na baixa da NOVA CARGA';
+    if (nfLabel) nfLabel.classList.toggle('required', tipo === 'descarrego');
+    if (cliente) cliente.placeholder = tipo === 'descarrego' ? 'Cliente do descarrego' : 'Cliente que vai fazer a coleta';
 }
 
 function abrirModalAgendaTransportadora() {
@@ -2833,8 +2853,16 @@ function salvarAgendaTransportadora() {
         mostrarToast('Preencha data, transportadora, motorista, placa e quantidade.', 'error');
         return;
     }
-    if (tipo === 'descarrego' && (!notaFiscal || !cliente)) {
-        mostrarToast('Para descarrego, informe nota fiscal e cliente.', 'error');
+    if (!cliente) {
+        mostrarToast('Informe o cliente da agenda.', 'error');
+        return;
+    }
+    if (tipo === 'descarrego' && !notaFiscal) {
+        mostrarToast('Para descarrego, informe a nota fiscal.', 'error');
+        return;
+    }
+    if (notaFiscal && notaFiscalJaUsada(notaFiscal)) {
+        mostrarToast('Nota fiscal ja cadastrada em outra carga ou agendamento. Cada cliente precisa ter sua propria nota.', 'error');
         return;
     }
     const agendaPendente = buscarAgendaPendenteMesmoVeiculo(motorista, placa);
@@ -2853,8 +2881,8 @@ function salvarAgendaTransportadora() {
         veiculo,
         tipoCarga,
         quantidade,
-        notaFiscal: tipo === 'descarrego' ? notaFiscal : '',
-        cliente: tipo === 'descarrego' ? cliente : '',
+        notaFiscal,
+        cliente,
         observacoes,
         status: 'PENDENTE',
         dataBaixa: null,
@@ -2873,19 +2901,123 @@ function salvarAgendaTransportadora() {
     mostrarToast('Agendamento salvo!');
 }
 
+function getClientePorNomeAgenda(nome) {
+    const alvo = normalizarAgendaValor(nome);
+    return bancoDados.clientes.find(c => normalizarAgendaValor(c.razao) === alvo);
+}
+
+function getTransportadoraPorNomeAgenda(nome) {
+    const alvo = normalizarAgendaValor(nome);
+    return bancoDados.transportadoras.find(t => normalizarAgendaValor(t.nome) === alvo);
+}
+
+function sincronizarCargaDaAgenda(item) {
+    if (!item || item.tipo !== 'coleta') return false;
+    const notaFiscal = String(item.notaFiscal || '').trim();
+    const clienteNome = String(item.cliente || '').trim();
+    if (!notaFiscal || !clienteNome) return false;
+
+    const existente = bancoDados.cargas.find(c =>
+        normalizarAgendaValor(c.notaFiscal) === normalizarAgendaValor(notaFiscal) &&
+        Number(c.agendaTransportadoraId) === Number(item.id)
+    );
+    if (existente) {
+        existente.agendaTransportadoraId = item.id;
+        if (!existente.clienteNome) existente.clienteNome = clienteNome;
+        if (!existente.motorista) existente.motorista = item.motorista || '';
+        if (!existente.placa) existente.placa = item.placa || '';
+        if (!existente.transportadoraNome) existente.transportadoraNome = item.transportadora || '';
+        registrarAlteracao(existente, 'Vinculou baixa de agenda', `Agenda ${item.id}`);
+        return false;
+    }
+
+    const cliente = getClientePorNomeAgenda(clienteNome);
+    const transportadora = getTransportadoraPorNomeAgenda(item.transportadora);
+    const qtde = Number(item.quantidade) || 0;
+    const novaCarga = {
+        id: proximoId(bancoDados.cargas),
+        usuarioId: usuarioAtual?.id || null,
+        usuarioNome: usuarioLogadoNome(),
+        notaFiscal,
+        sap: '',
+        clienteId: cliente?.id || null,
+        clienteNome,
+        cnpj: cliente?.cnpj || '',
+        endereco: cliente?.endereco || '',
+        cidade: cliente?.cidade || '',
+        uf: cliente?.uf || '',
+        representanteId: null,
+        representanteNome: '',
+        transportadoraId: transportadora?.id || null,
+        transportadoraNome: item.transportadora || '',
+        tipo: normalizarAgendaValor(item.tipoCarga) === 'CARGA BATIDA' ? 'nao_paletizada' : 'paletizada',
+        qtde,
+        valorUnitario: 0,
+        valorTotal: 0,
+        motorista: item.motorista || '',
+        placa: item.placa || '',
+        dataCarga: item.dataBaixa || new Date().toISOString(),
+        dataRetorno: null,
+        dataSaidaColeta: null,
+        dataRetornoColeta: null,
+        status: 'ABERTO',
+        observacoes: `Criado pela baixa do agendamento ${item.id}`,
+        motivoVale: '',
+        motivoNaoColetado: '',
+        agendaTransportadoraId: item.id
+    };
+    registrarAlteracao(novaCarga, 'Criou carga por baixa de agenda', `Agenda ${item.id}`);
+    bancoDados.cargas.push(novaCarga);
+    return true;
+}
+
 function baixarAgendaTransportadora(id) {
     if (!podeBaixarAgenda()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const item = getAgendaTransportadora().find(a => a.id === id);
     if (!item || item.status === 'BAIXADO') return;
-    const obs = prompt('Observacao da baixa (opcional):') || '';
+    const antes = {
+        cliente: item.cliente || '',
+        notaFiscal: item.notaFiscal || '',
+        status: item.status,
+        dataBaixa: item.dataBaixa,
+        diasBaixa: item.diasBaixa,
+        baixaPor: item.baixaPor || '',
+        observacaoBaixa: item.observacaoBaixa || ''
+    };
+    const cancelarBaixa = () => {
+        Object.assign(item, antes);
+        mostrarToast('Baixa cancelada.', 'info');
+    };
+    if (!String(item.cliente || '').trim()) {
+        const cliente = prompt('Cliente da carga/coleta (obrigatorio):', item.cliente || '');
+        if (cliente === null) { cancelarBaixa(); return; }
+        item.cliente = cliente.trim();
+    }
+    if (!item.cliente) { mostrarToast('Informe o cliente para dar baixa.', 'error'); return; }
+    if (!String(item.notaFiscal || '').trim()) {
+        const notaFiscal = prompt('Nota fiscal da carga (obrigatoria para baixa):', item.notaFiscal || '');
+        if (notaFiscal === null) { cancelarBaixa(); return; }
+        item.notaFiscal = notaFiscal.trim();
+    }
+    if (!item.notaFiscal) { mostrarToast('Informe a nota fiscal para dar baixa.', 'error'); return; }
+    if (notaFiscalJaUsada(item.notaFiscal, item.id)) {
+        Object.assign(item, antes);
+        mostrarToast('Nota fiscal ja usada em outra carga ou agendamento. Informe uma nota fiscal diferente.', 'error');
+        return;
+    }
+    const obs = prompt('Observacao da baixa (opcional):');
+    if (obs === null) { cancelarBaixa(); return; }
     item.status = 'BAIXADO';
     item.dataBaixa = new Date().toISOString();
     item.diasBaixa = calcularDiasAgenda(item);
     item.baixaPor = usuarioLogadoNome();
     item.observacaoBaixa = obs.trim();
+    const criouCarga = sincronizarCargaDaAgenda(item);
     salvarBanco();
+    atualizarDashboard();
+    atualizarTabela();
     atualizarAgendaTransportadora();
-    mostrarToast(`Baixa registrada em ${item.diasBaixa} dia(s).`);
+    mostrarToast(criouCarga ? `Baixa registrada e carga criada na tabela.` : `Baixa registrada em ${item.diasBaixa} dia(s).`);
 }
 
 function atualizarAgendaTransportadora() {
@@ -2903,7 +3035,7 @@ function atualizarAgendaTransportadora() {
     resumo.innerHTML = `
         <div class="agenda-summary-card"><span>Pendentes</span><strong>${pendentes.length}</strong></div>
         <div class="agenda-summary-card"><span>Baixados</span><strong>${baixados.length}</strong></div>
-        <div class="agenda-summary-card"><span>Coletas</span><strong>${coletas.length}</strong></div>
+        <div class="agenda-summary-card"><span>Nova carga</span><strong>${coletas.length}</strong></div>
         <div class="agenda-summary-card"><span>Descarregos</span><strong>${descarregos.length}</strong></div>
     `;
 
@@ -2913,6 +3045,7 @@ function atualizarAgendaTransportadora() {
             const renderItem = item => `
                 <div class="agenda-board-item">
                     <strong>${htmlSeguro(item.placa || '-')}</strong> - ${htmlSeguro(item.motorista || '-')}<br>
+                    ${item.tipo === 'descarrego' ? 'Descarrego' : 'NOVA CARGA'} | ${htmlSeguro(item.cliente || '-')}<br>
                     ${htmlSeguro(item.veiculo || '-')} | ${htmlSeguro(item.tipoCarga || '-')} | Qtde ${item.quantidade || 0}<br>
                     <small>${formatarDataHoraAgenda(item.dataAgenda)}${item.dataBaixa ? ' | Baixa: ' + formatarDataHoraAgenda(item.dataBaixa) : ''}</small>
                 </div>
@@ -2958,7 +3091,7 @@ function atualizarAgendaTransportadora() {
                             <tr>
                                 <td><span class="agenda-status ${statusClass}">${item.status === 'BAIXADO' ? 'Baixado' : 'Pendente'}</span></td>
                                 <td>${formatarDataHoraAgenda(item.dataAgenda)}</td>
-                                <td>${item.tipo === 'descarrego' ? 'Descarrego' : 'Coleta'}</td>
+                                <td>${item.tipo === 'descarrego' ? 'Descarrego' : 'NOVA CARGA'}</td>
                                 <td>${htmlSeguro(item.transportadora)}</td>
                                 <td>${htmlSeguro(item.motorista)}</td>
                                 <td><strong>${htmlSeguro(item.placa)}</strong><br><small>${htmlSeguro(item.veiculo)}</small></td>
@@ -3037,7 +3170,7 @@ function processarImportacao() {
             linhas.slice(1).forEach(l => {
                 const col = l.split(sep);
                 const nf = normalizarCampo(col[map.nf]);
-                if (!nf || bancoDados.cargas.some(c => c.notaFiscal === nf)) { puladas++; return; }
+                if (!nf || notaFiscalJaUsada(nf)) { puladas++; return; }
                 const clienteNome = normalizarCampo(col[map.cliente]) || 'CLIENTE NÃO INFORMADO';
                 let cliente = bancoDados.clientes.find(c => c.razao === clienteNome || (map.cnpj>=0 && c.cnpj === normalizarCampo(col[map.cnpj])));
                 if (!cliente) {
