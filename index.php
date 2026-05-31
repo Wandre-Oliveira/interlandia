@@ -1553,6 +1553,550 @@
                 flex-direction: column;
             }
         }
+
+        /* ===== TEMA PROFISSIONAL CLARO ===== */
+        :root {
+            --page-bg: #f3f6fa;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --surface-muted: #eef2f7;
+            --border: #d9e2ec;
+            --border-strong: #c7d2df;
+            --text: #17202a;
+            --muted: #637083;
+            --accent: #b88412;
+            --accent-dark: #8a640c;
+            --blue: #2563eb;
+            --cyan: #0284c7;
+            --green: #16803c;
+            --red: #c2413a;
+            --purple: #6d4fd8;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
+            --shadow-md: 0 10px 28px rgba(15, 23, 42, .10);
+            --shadow-lg: 0 24px 60px rgba(15, 23, 42, .16);
+        }
+
+        html {
+            background: var(--page-bg);
+        }
+
+        body {
+            background: var(--page-bg) !important;
+            color: var(--text) !important;
+        }
+
+        body::before {
+            display: none !important;
+        }
+
+        .login-screen {
+            background:
+                linear-gradient(180deg, rgba(243,246,250,.96), rgba(232,238,246,.96)),
+                url("assets/logo_dragao.jpg") center/240px auto no-repeat !important;
+        }
+
+        .main-wrapper {
+            max-width: 1780px !important;
+            margin: 0 auto !important;
+            padding: 18px !important;
+        }
+
+        .login-card,
+        .app-header,
+        .admin-bar,
+        .busca-rapida,
+        .filtros-container,
+        .table-container,
+        .stat-card,
+        .modal-content,
+        .agenda-panel,
+        .agenda-board-section,
+        .agenda-summary-card,
+        .cliente-palete-card {
+            background: var(--surface) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            box-shadow: var(--shadow-sm) !important;
+            backdrop-filter: none !important;
+        }
+
+        .login-card,
+        .modal-content {
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .app-header {
+            border-radius: 10px !important;
+            padding: 14px 18px !important;
+            top: 10px !important;
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        .logo-area h1,
+        .login-logo h2,
+        .modal-header h2,
+        .filtros-header h3,
+        .agenda-header h3 {
+            color: var(--text) !important;
+            letter-spacing: 0 !important;
+        }
+
+        .logo-area h1::after {
+            color: var(--muted) !important;
+        }
+
+        .user-badge {
+            background: var(--surface-soft);
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            padding: 5px 10px 5px 5px;
+        }
+
+        .user-info h4,
+        .stat-value,
+        .cliente-palete-card .stat-cliente-valor,
+        .qtde-numero,
+        .agenda-summary-card strong,
+        .agenda-board-item strong {
+            color: var(--text) !important;
+        }
+
+        .user-info span,
+        .input-group label,
+        .form-group label,
+        .stat-title,
+        .stat-detalhe,
+        .agenda-header span,
+        .filtros-header span,
+        .agenda-summary-card span,
+        .agenda-summary-card small,
+        .modal-close,
+        .loading,
+        .agenda-empty {
+            color: var(--muted) !important;
+        }
+
+        .logo-placeholder,
+        .user-avatar,
+        .qtde-c {
+            background: linear-gradient(135deg, #f6d365, var(--accent)) !important;
+            color: #1f2937 !important;
+            box-shadow: none !important;
+        }
+
+        .company-logo {
+            background: #fff;
+            border: 1px solid var(--border);
+        }
+
+        .admin-bar,
+        .busca-rapida,
+        .filtros-container,
+        .agenda-panel {
+            border-radius: 10px !important;
+            margin-bottom: 16px !important;
+        }
+
+        .admin-bar {
+            background: var(--surface-soft) !important;
+            align-items: center !important;
+        }
+
+        .admin-bar::before {
+            color: var(--muted) !important;
+        }
+
+        .action-buttons {
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+            gap: 10px !important;
+            margin-bottom: 16px !important;
+        }
+
+        .btn-action,
+        .btn-admin,
+        .btn-login,
+        .btn-buscar,
+        .btn-filtrar,
+        .btn-limpar,
+        .btn-mini,
+        .btn-logout,
+        .btn-acao {
+            border-radius: 8px !important;
+            box-shadow: none !important;
+            font-weight: 700 !important;
+            letter-spacing: 0 !important;
+        }
+
+        .btn-action {
+            min-height: 44px !important;
+            padding: 10px 14px !important;
+            border: 1px solid transparent !important;
+        }
+
+        .btn-action:hover,
+        .btn-admin:hover,
+        .btn-login:hover,
+        .btn-buscar:hover,
+        .btn-filtrar:hover,
+        .btn-limpar:hover,
+        .btn-mini:hover,
+        .btn-acao:hover {
+            transform: translateY(-1px) !important;
+            filter: brightness(.98) !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+
+        .btn-action-primary,
+        .btn-admin,
+        .btn-login,
+        .btn-buscar,
+        .btn-filtrar,
+        .btn-editar {
+            background: var(--accent) !important;
+            color: #ffffff !important;
+        }
+
+        .btn-action-success,
+        .btn-retorno {
+            background: var(--green) !important;
+            color: #ffffff !important;
+        }
+
+        .btn-action-warning,
+        .btn-retorno-coleta {
+            background: #f59e0b !important;
+            color: #1f2937 !important;
+        }
+
+        .btn-action-purple,
+        .btn-saida-coleta {
+            background: var(--purple) !important;
+            color: #ffffff !important;
+        }
+
+        .btn-action-info,
+        .btn-detalhes {
+            background: var(--cyan) !important;
+            color: #ffffff !important;
+        }
+
+        .btn-action-secondary,
+        .btn-limpar,
+        .btn-logout,
+        .btn-mini {
+            background: var(--surface) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border-strong) !important;
+        }
+
+        input,
+        select,
+        textarea,
+        .input-group input,
+        .form-group input,
+        .form-group select,
+        .form-group textarea,
+        .busca-grid input,
+        .filtros-grid input,
+        .filtros-grid select {
+            background: var(--surface) !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border-strong) !important;
+            border-radius: 8px !important;
+            box-shadow: none !important;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #94a3b8 !important;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent) !important;
+            box-shadow: 0 0 0 3px rgba(184,132,18,.14) !important;
+            outline: none !important;
+        }
+
+        .dashboard-horizontal {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+            gap: 12px !important;
+            overflow: visible !important;
+            margin-bottom: 16px !important;
+        }
+
+        .stat-card {
+            border-radius: 10px !important;
+            padding: 16px !important;
+            min-width: 0 !important;
+            transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease !important;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent) !important;
+            box-shadow: var(--shadow-md) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        .stat-header i {
+            color: var(--accent) !important;
+            font-size: 22px !important;
+        }
+
+        .stat-value {
+            font-size: 28px !important;
+        }
+
+        .card-destaque {
+            background: linear-gradient(180deg, #ffffff, #fff8e6) !important;
+            border-left: 4px solid var(--accent) !important;
+        }
+
+        .stat-cliente-item {
+            border-bottom: 1px solid var(--border) !important;
+        }
+
+        .stat-cliente-nome {
+            color: var(--accent-dark) !important;
+        }
+
+        .stat-palete-item {
+            background: var(--surface-muted) !important;
+            color: var(--muted) !important;
+            border-radius: 999px !important;
+        }
+
+        .cliente-palete-card {
+            background: var(--surface-soft) !important;
+            border-radius: 10px !important;
+        }
+
+        .filtros-header,
+        .agenda-header {
+            background: var(--surface-soft) !important;
+            border-bottom: 1px solid var(--border) !important;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .filtros-container {
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+
+        .filtros-grid,
+        .filtros-botoes {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+        }
+
+        .filtros-grid {
+            margin-top: 16px !important;
+        }
+
+        .filtros-botoes {
+            padding-bottom: 16px !important;
+        }
+
+        .table-container {
+            border-radius: 10px !important;
+            overflow: auto !important;
+            max-height: 62vh !important;
+            box-shadow: var(--shadow-sm) !important;
+        }
+
+        table,
+        .agenda-table {
+            background: var(--surface) !important;
+            color: var(--text) !important;
+            font-size: 12px !important;
+        }
+
+        th {
+            background: #f1f5f9 !important;
+            color: #334155 !important;
+            border-bottom: 1px solid var(--border-strong) !important;
+            text-transform: uppercase !important;
+            font-size: 10px !important;
+            letter-spacing: .04em !important;
+            z-index: 3 !important;
+        }
+
+        td {
+            color: #334155 !important;
+            border-bottom: 1px solid var(--border) !important;
+            background: transparent !important;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafcff !important;
+        }
+
+        tr:hover {
+            background: #eff6ff !important;
+        }
+
+        .badge {
+            border-radius: 999px !important;
+            padding: 4px 9px !important;
+            font-size: 10px !important;
+            white-space: nowrap !important;
+        }
+
+        .badge-aberto {
+            background: #fff7d6 !important;
+            color: #8a5a00 !important;
+        }
+
+        .badge-vale {
+            background: #efe7ff !important;
+            color: #5b21b6 !important;
+        }
+
+        .badge-concluido {
+            background: #dcfce7 !important;
+            color: #166534 !important;
+        }
+
+        .badge-em-coleta {
+            background: #e0f2fe !important;
+            color: #075985 !important;
+        }
+
+        .badge-batida {
+            background: #fee2e2 !important;
+            color: #991b1b !important;
+        }
+
+        .modal {
+            background: rgba(15, 23, 42, .46) !important;
+            padding: 18px !important;
+        }
+
+        .modal-content {
+            border-radius: 12px !important;
+        }
+
+        .modal-header {
+            background: var(--surface-soft) !important;
+            border-bottom: 1px solid var(--border) !important;
+            padding: 16px 18px !important;
+        }
+
+        .modal-body {
+            padding: 18px !important;
+        }
+
+        .modal-close {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: var(--surface-muted);
+        }
+
+        .opcao-retorno {
+            background: var(--surface-soft) !important;
+            border: 1px solid var(--border-strong) !important;
+            color: var(--text) !important;
+        }
+
+        .opcao-retorno:hover {
+            background: #eff6ff !important;
+            border-color: var(--blue) !important;
+        }
+
+        .opcao-retorno.selected {
+            background: #dcfce7 !important;
+            border-color: var(--green) !important;
+        }
+
+        .agenda-panel {
+            border-radius: 10px !important;
+            overflow: hidden !important;
+        }
+
+        .agenda-summary {
+            background: var(--surface) !important;
+        }
+
+        .agenda-summary-card,
+        .agenda-board-section,
+        .agenda-board-item,
+        .agenda-empty {
+            background: var(--surface-soft) !important;
+            border-color: var(--border) !important;
+            border-radius: 10px !important;
+        }
+
+        .agenda-status.pendente {
+            background: #fff7d6 !important;
+            color: #8a5a00 !important;
+            border-color: #f3d17c !important;
+        }
+
+        .agenda-status.baixado {
+            background: #dcfce7 !important;
+            color: #166534 !important;
+            border-color: #86efac !important;
+        }
+
+        .toast {
+            background: #ffffff !important;
+            color: var(--text) !important;
+            border: 1px solid var(--border-strong) !important;
+            box-shadow: var(--shadow-lg) !important;
+        }
+
+        .registro-card,
+        #resultadoBusca div,
+        #cargasAbertasLista div,
+        #valesLista div,
+        #emColetaLista div,
+        #dadosCargaRetorno,
+        #dadosValeSaida,
+        #dadosRetornoColeta,
+        [style*="background:#0f1a24"],
+        [style*="background:#1e2a3a"],
+        [style*="background:#1a3a2a"] {
+            background: var(--surface-soft) !important;
+            color: var(--text) !important;
+            border-color: var(--border) !important;
+        }
+
+        [style*="color:#8a9dc0"],
+        [style*="color: #8a9dc0"] {
+            color: var(--muted) !important;
+        }
+
+        [style*="color:#e0e0e0"],
+        [style*="color: #e0e0e0"] {
+            color: var(--text) !important;
+        }
+
+        @media (max-width: 768px) {
+            .main-wrapper {
+                padding: 10px !important;
+            }
+
+            .app-header,
+            .login-card,
+            .admin-bar,
+            .busca-rapida,
+            .filtros-container,
+            .table-container,
+            .stat-card,
+            .agenda-panel {
+                border-radius: 8px !important;
+            }
+
+            .dashboard-horizontal {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 <body>
