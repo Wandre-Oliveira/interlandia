@@ -2395,9 +2395,9 @@
     </div>
     <div class="form-row">
         <div class="form-group"><label class="required">Quantidade</label><input type="number" id="agendaQuantidade" min="0" step="1" placeholder="Quantidade"></div>
-        <div class="form-group"><label class="required">Nota fiscal do produto</label><input type="text" id="agendaNotaProduto" placeholder="NF do produto"></div>
+        <div class="form-group" id="agendaNotaProdutoGrupo"><label class="required">Nota fiscal do produto</label><input type="text" id="agendaNotaProduto" placeholder="NF do produto"></div>
     </div>
-    <div class="form-row">
+    <div class="form-row" id="agendaNotaPaleteGrupo">
         <div class="form-group"><label class="required">Nota fiscal de palete</label><input type="text" id="agendaNotaPalete" placeholder="NF do palete"></div>
         <input type="hidden" id="agendaNotaFiscal">
     </div>
@@ -3418,10 +3418,19 @@ function atualizarCamposAgendaTransportadora() {
     const tipo = document.getElementById('agendaTipo')?.value;
     const notaProduto = document.getElementById('agendaNotaProduto');
     const notaPalete = document.getElementById('agendaNotaPalete');
+    const notaProdutoGrupo = document.getElementById('agendaNotaProdutoGrupo');
+    const notaPaleteGrupo = document.getElementById('agendaNotaPaleteGrupo');
     const notaFiscalAntiga = document.getElementById('agendaNotaFiscal');
     const cliente = document.getElementById('agendaCliente');
-    if (notaProduto) notaProduto.placeholder = tipo === 'descarrego' ? 'NF do produto no descarrego' : 'NF do produto para carregar';
-    if (notaPalete) notaPalete.placeholder = tipo === 'descarrego' ? 'NF de palete no descarrego' : 'NF de palete para carregar';
+    const exigeNotaNoAgendamento = tipo === 'descarrego';
+    if (notaProdutoGrupo) notaProdutoGrupo.style.display = exigeNotaNoAgendamento ? 'block' : 'none';
+    if (notaPaleteGrupo) notaPaleteGrupo.style.display = exigeNotaNoAgendamento ? 'grid' : 'none';
+    if (!exigeNotaNoAgendamento) {
+        if (notaProduto) notaProduto.value = '';
+        if (notaPalete) notaPalete.value = '';
+    }
+    if (notaProduto) notaProduto.placeholder = 'NF do produto no descarrego';
+    if (notaPalete) notaPalete.placeholder = 'NF de palete no descarrego';
     if (notaFiscalAntiga) notaFiscalAntiga.value = notaProduto?.value || '';
     if (cliente) cliente.placeholder = tipo === 'descarrego' ? 'Cliente do descarrego' : 'Cliente que vai fazer a coleta';
 }
@@ -3467,18 +3476,20 @@ function salvarAgendaTransportadora() {
         mostrarToast('Informe o cliente da agenda.', 'error');
         return;
     }
-    if (!notaProduto || !notaPalete) {
-        mostrarToast('Informe a nota fiscal do produto e a nota fiscal de palete.', 'error');
-        return;
-    }
-    if (normalizarAgendaValor(notaProduto) === normalizarAgendaValor(notaPalete)) {
-        mostrarToast('Nota fiscal do produto e nota fiscal de palete nao podem ser iguais.', 'error');
-        return;
+    if (tipo === 'descarrego') {
+        if (!notaProduto || !notaPalete) {
+            mostrarToast('Informe a nota fiscal do produto e a nota fiscal de palete.', 'error');
+            return;
+        }
+        if (normalizarAgendaValor(notaProduto) === normalizarAgendaValor(notaPalete)) {
+            mostrarToast('Nota fiscal do produto e nota fiscal de palete nao podem ser iguais.', 'error');
+            return;
+        }
     }
     if (!validarFrotaInterlandia(transportadora, motorista, placa)) {
         return;
     }
-    if (notaFiscalJaUsada(notaProduto) || notaFiscalJaUsada(notaPalete)) {
+    if ((notaProduto && notaFiscalJaUsada(notaProduto)) || (notaPalete && notaFiscalJaUsada(notaPalete))) {
         mostrarToast('Nota fiscal ja cadastrada em outra carga ou agendamento. Cada cliente precisa ter suas proprias notas.', 'error');
         return;
     }
