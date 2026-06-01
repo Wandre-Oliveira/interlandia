@@ -2489,6 +2489,49 @@
             min-height: 0 !important;
         }
 
+        .modal-nova-carga-content {
+            width: min(920px, calc(100vw - 32px)) !important;
+        }
+
+        #modalNovaCarga .modal-body {
+            background: linear-gradient(180deg, #ffffff 0%, #fbfdfb 100%) !important;
+            padding: 18px 22px 22px !important;
+        }
+
+        #modalNovaCarga .form-row {
+            gap: 12px !important;
+            margin-bottom: 0 !important;
+        }
+
+        #modalNovaCarga .form-group {
+            margin-bottom: 12px !important;
+        }
+
+        #modalNovaCarga input,
+        #modalNovaCarga select,
+        #modalNovaCarga textarea {
+            min-height: 42px !important;
+        }
+
+        #modalNovaCarga .quantidade-container {
+            align-items: center;
+        }
+
+        .nova-carga-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 4px;
+        }
+
+        .nova-carga-actions .btn-login {
+            width: auto !important;
+            min-width: 180px;
+        }
+
+        .campo-condicao-transportadora {
+            border-left: 4px solid var(--dragao-green-700) !important;
+        }
+
         .modal-close {
             background: var(--dragao-green-100) !important;
             color: var(--dragao-green-900) !important;
@@ -2731,7 +2774,7 @@
 
 <!-- Modal Nova Carga -->
 <div id="modalNovaCarga" class="modal">
-    <div class="modal-content">
+    <div class="modal-content modal-nova-carga-content">
         <div class="modal-header"><h2><i class="fas fa-boxes"></i> NOVA CARGA</h2><span class="modal-close" onclick="fecharModal('modalNovaCarga')">&times;</span></div>
         <div class="modal-body">
             <div class="form-row">
@@ -2751,6 +2794,14 @@
                 <div class="form-group"><label>Representante</label><select id="cargaRepresentanteSelect"></select></div>
                 <div class="form-group"><label>Transportadora</label><select id="cargaTransportadoraSelect" onchange="verificarTransportadoraSelecionada()"></select></div>
             </div>
+            <div class="form-group campo-condicao-transportadora" id="cargaCondicaoTransportadoraGrupo" style="display:none;">
+                <label class="required">Condicao</label>
+                <select id="cargaCondicaoTransportadora">
+                    <option value="">Selecione</option>
+                    <option value="Troca">Troca</option>
+                    <option value="Casa">Casa</option>
+                </select>
+            </div>
             <div class="form-row">
                 <div class="form-group"><label class="required">Motorista</label><input type="text" id="cargaMotorista" list="listaMotoristas"></div>
                 <div class="form-group"><label class="required">Placa</label><input type="text" id="cargaPlaca" list="listaPlacas"></div>
@@ -2765,7 +2816,7 @@
             <div id="alertaRestricaoNovaCarga" class="alerta-restricao" style="display:none; background:#2a1a1a; border-left:4px solid #dc3545; padding:10px; border-radius:8px; margin-top:12px;">
                 <i class="fas fa-exclamation-triangle"></i> Este motorista so nao pode receber NOVA CARGA se o status dele estiver em ABERTO.
             </div>
-            <button class="btn-login" id="btnSalvarNovaCarga" onclick="salvarNovaCarga()"><i class="fas fa-save"></i> Salvar</button>
+            <div class="nova-carga-actions"><button class="btn-login" id="btnSalvarNovaCarga" onclick="salvarNovaCarga()"><i class="fas fa-save"></i> Salvar</button></div>
         </div>
     </div>
 </div>
@@ -3277,10 +3328,20 @@ function verificarTransportadoraInterlandia() {
     const indicador = document.getElementById('indicadorC');
     if (indicador) indicador.style.display = text === "INTERLANDIA" ? 'flex' : 'none';
 }
+function atualizarCondicaoTransportadoraNovaCarga(transp = null) {
+    const grupo = document.getElementById('cargaCondicaoTransportadoraGrupo');
+    const campo = document.getElementById('cargaCondicaoTransportadora');
+    if (!grupo || !campo) return;
+    const mostrar = !!transp && !isNomeInterlandia(transp.nome);
+    grupo.style.display = mostrar ? 'block' : 'none';
+    campo.required = mostrar;
+    if (!mostrar) campo.value = '';
+}
 function verificarTransportadoraSelecionada() {
     verificarTransportadoraInterlandia();
     const select = document.getElementById('cargaTransportadoraSelect');
     const transp = bancoDados.transportadoras.find(t => t.id == select.value);
+    atualizarCondicaoTransportadoraNovaCarga(transp);
     let frota = getFrotaTransportadora(transp);
     if (transp && !isNomeInterlandia(transp.nome)) {
         frota = frota.filter(f => !itemPertenceFrotaInterlandia(f.motorista, f.carro));
@@ -3526,6 +3587,7 @@ function abrirModalNovaCarga() {
     document.querySelectorAll('#modalNovaCarga input, #modalNovaCarga select').forEach(i => { if (i.id !== 'cargaValorUnitario') i.value = ''; });
     document.getElementById('cargaValorUnitario').value = '100';
     document.getElementById('alertaRestricaoNovaCarga').style.display = 'none';
+    atualizarCondicaoTransportadoraNovaCarga();
     document.getElementById('cargaQtde').readOnly = false;
     const mi = document.getElementById('cargaMotorista'), pi = document.getElementById('cargaPlaca');
     const v = () => { if (mi.value.trim() && verificarViagemAberta(mi.value.trim(), pi.value.trim())) { document.getElementById('alertaRestricaoNovaCarga').style.display = 'block'; document.getElementById('btnSalvarNovaCarga').disabled = true; } else { document.getElementById('alertaRestricaoNovaCarga').style.display = 'none'; document.getElementById('btnSalvarNovaCarga').disabled = false; } };
@@ -3563,11 +3625,14 @@ function salvarNovaCarga() {
     const rnome = rid ? bancoDados.representantes.find(r => r.id == rid)?.nome : '';
     const tid = document.getElementById('cargaTransportadoraSelect').value;
     const tnome = tid ? bancoDados.transportadoras.find(t => t.id == tid)?.nome : '';
+    const condicaoTransportadora = document.getElementById('cargaCondicaoTransportadora')?.value || '';
+    if (tnome && !isNomeInterlandia(tnome) && !condicaoTransportadora) { mostrarToast('Informe a condicao: Troca ou Casa.', 'error'); return; }
     if (!validarFrotaInterlandia(tnome, motorista, placa)) return;
     let obs = '';
     if (tnome === "INTERLANDIA") obs = "C - Carga INTERLANDIA";
-    const novaCarga = { id: bancoDados.cargas.length + 1, usuarioId: usuarioAtual.id, usuarioNome: usuarioAtual.nome, notaFiscal: nf, notaProduto, sap, clienteId: cid, clienteNome: cnome || cn, cnpj: ccnpj || document.getElementById('cargaCNPJ').value.trim(), endereco: cend || document.getElementById('cargaEndereco').value.trim(), cidade: ccidade || document.getElementById('cargaCidade').value.trim(), uf: cuf || document.getElementById('cargaUF').value.toUpperCase(), representanteId: rid || null, representanteNome: rnome || '', transportadoraId: tid || null, transportadoraNome: tnome || '', tipo, qtde, valorUnitario: vu, valorTotal: qtde * vu, motorista, placa, dataCarga: new Date().toISOString(), dataRetorno: null, dataSaidaColeta: null, dataRetornoColeta: null, status: "ABERTO", observacoes: obs, motivoVale: "", motivoNaoColetado: "", indicadorC: true };
-    registrarAlteracao(novaCarga, 'Criou carga', `NF ${nf}. NF produto ${notaProduto}`);
+    else if (condicaoTransportadora) obs = `Condicao: ${condicaoTransportadora}`;
+    const novaCarga = { id: bancoDados.cargas.length + 1, usuarioId: usuarioAtual.id, usuarioNome: usuarioAtual.nome, notaFiscal: nf, notaProduto, sap, clienteId: cid, clienteNome: cnome || cn, cnpj: ccnpj || document.getElementById('cargaCNPJ').value.trim(), endereco: cend || document.getElementById('cargaEndereco').value.trim(), cidade: ccidade || document.getElementById('cargaCidade').value.trim(), uf: cuf || document.getElementById('cargaUF').value.toUpperCase(), representanteId: rid || null, representanteNome: rnome || '', transportadoraId: tid || null, transportadoraNome: tnome || '', condicaoTransportadora, tipo, qtde, valorUnitario: vu, valorTotal: qtde * vu, motorista, placa, dataCarga: new Date().toISOString(), dataRetorno: null, dataSaidaColeta: null, dataRetornoColeta: null, status: "ABERTO", observacoes: obs, motivoVale: "", motivoNaoColetado: "", indicadorC: true };
+    registrarAlteracao(novaCarga, 'Criou carga', `NF ${nf}. NF produto ${notaProduto}${condicaoTransportadora ? '. Condicao ' + condicaoTransportadora : ''}`);
     bancoDados.cargas.push(novaCarga);
     salvarBanco(); carregarSelects(); fecharModal('modalNovaCarga'); atualizarDashboard(); atualizarTabela(); mostrarToast(`Carga NF ${nf} registrada!`);
 }
@@ -3808,7 +3873,7 @@ function atualizarTabela() {
         if (c.status === 'VALE PALLETE' && isMaster()) bt += `<button class="btn-acao btn-saida-coleta" onclick="event.stopPropagation(); abrirModalSaidaColeta(); document.getElementById('buscaSaidaNF').value='${c.sap || c.notaFiscal}'; buscarValeParaSaida();"><i class="fas fa-truck"></i> Sair</button>`;
         if (c.status === 'EM COLETA' && isMaster()) bt += `<button class="btn-acao btn-retorno-coleta" onclick="event.stopPropagation(); abrirModalRetornoColeta(); document.getElementById('buscaRetornoNFColeta').value='${c.sap || c.notaFiscal}'; buscarEmColetaParaRetorno();"><i class="fas fa-undo-alt"></i> Ret</button>`;
         if (isMaster()) bt += `<button class="btn-acao btn-editar" onclick="event.stopPropagation(); abrirEdicaoCarga(${JSON.stringify(c).replace(/"/g, '&quot;')});"><i class="fas fa-edit"></i> Editar</button>`;
-        bt += `<button class="btn-acao btn-detalhes" onclick="event.stopPropagation(); alert('NF: ${c.notaFiscal}\\nCliente: ${c.clienteNome}\\nCidade: ${getCidadeCarga(c) || '-'}\\nSAP: ${c.sap || '-'}\\nStatus: ${c.status}\\nUltima mudança: ${c.ultimaAlteracaoUsuario || c.usuarioNome || '-'}\\nValor: ${formatarMoeda(c.valorTotal)}');"><i class="fas fa-info-circle"></i> Info</button>`;
+        bt += `<button class="btn-acao btn-detalhes" onclick="event.stopPropagation(); alert('NF: ${c.notaFiscal}\\nCliente: ${c.clienteNome}\\nCidade: ${getCidadeCarga(c) || '-'}\\nSAP: ${c.sap || '-'}\\nTransportadora: ${c.transportadoraNome || '-'}\\nCondicao: ${c.condicaoTransportadora || '-'}\\nStatus: ${c.status}\\nUltima mudança: ${c.ultimaAlteracaoUsuario || c.usuarioNome || '-'}\\nValor: ${formatarMoeda(c.valorTotal)}');"><i class="fas fa-info-circle"></i> Info</button>`;
         bt += `</div>`;
         acoes.innerHTML = bt;
     });
@@ -3866,11 +3931,11 @@ function exportarRelatorio() {
     if (!podeExportarRelatorio()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const dados = filtrosAtivos ? cargasFiltradas : getTodasCargas();
     if (!dados.length) { mostrarToast('Nenhum dado!', 'error'); return; }
-    let csv = "Nota Fiscal;SAP;Cliente;CNPJ;Cidade;UF;Motorista;Placa;Transportadora;Representante;Data Carga;Data Retorno;Data Saída Coleta;Data Retorno Coleta;Status;Quantidade;Valor Total;Usuario Cadastro;Usuario Ultima Mudanca;Data Ultima Mudanca;Acao Ultima Mudanca;Historico de Mudancas\n";
+    let csv = "Nota Fiscal;SAP;Cliente;CNPJ;Cidade;UF;Motorista;Placa;Transportadora;Condicao;Representante;Data Carga;Data Retorno;Data Saída Coleta;Data Retorno Coleta;Status;Quantidade;Valor Total;Usuario Cadastro;Usuario Ultima Mudanca;Data Ultima Mudanca;Acao Ultima Mudanca;Historico de Mudancas\n";
     dados.forEach(c => {
         const linha = [
             c.notaFiscal, c.sap || '', c.clienteNome, c.cnpj || '', getCidadeCarga(c) || '', c.uf,
-            c.motorista, c.placa, c.transportadoraNome || '', c.representanteNome || '',
+            c.motorista, c.placa, c.transportadoraNome || '', c.condicaoTransportadora || '', c.representanteNome || '',
             formatarData(c.dataCarga), formatarData(c.dataRetorno), formatarData(c.dataSaidaColeta), formatarData(c.dataRetornoColeta),
             c.status, c.qtde, (Number(c.valorTotal) || 0).toFixed(2), c.usuarioNome || '',
             c.ultimaAlteracaoUsuario || '', formatarData(c.ultimaAlteracaoData), c.ultimaAlteracaoAcao || '', historicoAlteracoesTexto(c)
