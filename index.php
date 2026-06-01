@@ -2248,6 +2248,7 @@
                 <div class="form-group"><label class="required">Nota Fiscal</label><input type="text" id="cargaNotaFiscal"></div>
                 <div class="form-group"><label>SAP</label><input type="text" id="cargaSAP"></div>
             </div>
+            <div class="form-group"><label class="required">Nota Fiscal de Produto</label><input type="text" id="cargaNotaProduto" placeholder="Informe a NF do produto"></div>
             <div class="form-group"><label>Cliente</label><select id="cargaClienteSelect"><option value="">Selecione</option></select></div>
             <div class="form-group"><label>Ou novo cliente</label><input type="text" id="cargaClienteNovo"></div>
             <div class="form-group"><label>CNPJ</label><input type="text" id="cargaCNPJ"></div>
@@ -2948,9 +2949,13 @@ function abrirModalNovaCarga() {
 function salvarNovaCarga() {
     if (!podeOperarCargas()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const nf = document.getElementById('cargaNotaFiscal').value.trim();
+    const notaProduto = document.getElementById('cargaNotaProduto').value.trim();
     if (!nf) { mostrarToast('Nota Fiscal obrigatória!', 'error'); return; }
     if (bancoDados.cargas.some(c => c.notaFiscal === nf)) { mostrarToast('Nota Fiscal já cadastrada!', 'error'); return; }
     if (notaFiscalJaUsada(nf)) { mostrarToast('Nota Fiscal ja cadastrada em outra carga ou agendamento!', 'error'); return; }
+    if (!notaProduto) { mostrarToast('Nota Fiscal de Produto obrigatoria!', 'error'); return; }
+    if (normalizarAgendaValor(nf) === normalizarAgendaValor(notaProduto)) { mostrarToast('Nota Fiscal e Nota Fiscal de Produto nao podem ser iguais!', 'error'); return; }
+    if (notaFiscalJaUsada(notaProduto)) { mostrarToast('Nota Fiscal de Produto ja cadastrada em outra carga ou agendamento!', 'error'); return; }
     const motorista = document.getElementById('cargaMotorista').value.trim();
     const placa = document.getElementById('cargaPlaca').value.trim();
     if (!motorista || !placa) { mostrarToast('Motorista e Placa obrigatórios!', 'error'); return; }
@@ -2973,8 +2978,8 @@ function salvarNovaCarga() {
     if (!validarFrotaInterlandia(tnome, motorista, placa)) return;
     let obs = '';
     if (tnome === "INTERLANDIA") obs = "C - Carga INTERLANDIA";
-    const novaCarga = { id: bancoDados.cargas.length + 1, usuarioId: usuarioAtual.id, usuarioNome: usuarioAtual.nome, notaFiscal: nf, sap, clienteId: cid, clienteNome: cnome || cn, cnpj: ccnpj || document.getElementById('cargaCNPJ').value.trim(), endereco: cend || document.getElementById('cargaEndereco').value.trim(), cidade: ccidade || document.getElementById('cargaCidade').value.trim(), uf: cuf || document.getElementById('cargaUF').value.toUpperCase(), representanteId: rid || null, representanteNome: rnome || '', transportadoraId: tid || null, transportadoraNome: tnome || '', tipo, qtde, valorUnitario: vu, valorTotal: qtde * vu, motorista, placa, dataCarga: new Date().toISOString(), dataRetorno: null, dataSaidaColeta: null, dataRetornoColeta: null, status: "ABERTO", observacoes: obs, motivoVale: "", motivoNaoColetado: "", indicadorC: true };
-    registrarAlteracao(novaCarga, 'Criou carga', `NF ${nf}`);
+    const novaCarga = { id: bancoDados.cargas.length + 1, usuarioId: usuarioAtual.id, usuarioNome: usuarioAtual.nome, notaFiscal: nf, notaProduto, sap, clienteId: cid, clienteNome: cnome || cn, cnpj: ccnpj || document.getElementById('cargaCNPJ').value.trim(), endereco: cend || document.getElementById('cargaEndereco').value.trim(), cidade: ccidade || document.getElementById('cargaCidade').value.trim(), uf: cuf || document.getElementById('cargaUF').value.toUpperCase(), representanteId: rid || null, representanteNome: rnome || '', transportadoraId: tid || null, transportadoraNome: tnome || '', tipo, qtde, valorUnitario: vu, valorTotal: qtde * vu, motorista, placa, dataCarga: new Date().toISOString(), dataRetorno: null, dataSaidaColeta: null, dataRetornoColeta: null, status: "ABERTO", observacoes: obs, motivoVale: "", motivoNaoColetado: "", indicadorC: true };
+    registrarAlteracao(novaCarga, 'Criou carga', `NF ${nf}. NF produto ${notaProduto}`);
     bancoDados.cargas.push(novaCarga);
     salvarBanco(); carregarSelects(); fecharModal('modalNovaCarga'); atualizarDashboard(); atualizarTabela(); mostrarToast(`Carga NF ${nf} registrada!`);
 }
@@ -3335,7 +3340,7 @@ function notaFiscalJaUsada(notaFiscal, agendaIgnorarId = null, cargaIgnorarId = 
     const nf = normalizarAgendaValor(notaFiscal);
     if (!nf) return false;
     const existeNaCarga = bancoDados.cargas.some(c =>
-        normalizarAgendaValor(c.notaFiscal) === nf &&
+        [c.notaFiscal, c.notaProduto, c.notaPalete].some(valor => normalizarAgendaValor(valor) === nf) &&
         (cargaIgnorarId === null || Number(c.id) !== Number(cargaIgnorarId))
     );
     const existeNaAgenda = getAgendaTransportadora().some(a =>
