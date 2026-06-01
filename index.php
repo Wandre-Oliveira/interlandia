@@ -2395,7 +2395,11 @@
     </div>
     <div class="form-row">
         <div class="form-group"><label class="required">Quantidade</label><input type="number" id="agendaQuantidade" min="0" step="1" placeholder="Quantidade"></div>
-        <div class="form-group"><label id="agendaNotaFiscalLabel">Nota fiscal</label><input type="text" id="agendaNotaFiscal" placeholder="Obrigatoria na baixa da NOVA CARGA"></div>
+        <div class="form-group"><label class="required">Nota fiscal do produto</label><input type="text" id="agendaNotaProduto" placeholder="NF do produto"></div>
+    </div>
+    <div class="form-row">
+        <div class="form-group"><label class="required">Nota fiscal de palete</label><input type="text" id="agendaNotaPalete" placeholder="NF do palete"></div>
+        <input type="hidden" id="agendaNotaFiscal">
     </div>
     <div class="form-group"><label class="required" id="agendaClienteLabel">Cliente</label><input type="text" id="agendaCliente" list="listaAgendaClientes" placeholder="Cliente que vai fazer a coleta"></div>
     <datalist id="listaAgendaClientes"></datalist>
@@ -3319,6 +3323,7 @@ function htmlSeguro(v) {
 
 function getAgendaTransportadora() {
     garantirEstruturaBanco();
+    bancoDados.agendaTransportadora.forEach(normalizarNotasAgendaLegado);
     return bancoDados.agendaTransportadora;
 }
 
@@ -3334,10 +3339,24 @@ function notaFiscalJaUsada(notaFiscal, agendaIgnorarId = null, cargaIgnorarId = 
         (cargaIgnorarId === null || Number(c.id) !== Number(cargaIgnorarId))
     );
     const existeNaAgenda = getAgendaTransportadora().some(a =>
-        normalizarAgendaValor(a.notaFiscal) === nf &&
+        [a.notaFiscal, a.notaProduto, a.notaPalete].some(v => normalizarAgendaValor(v) === nf) &&
         (agendaIgnorarId === null || Number(a.id) !== Number(agendaIgnorarId))
     );
     return existeNaCarga || existeNaAgenda;
+}
+
+function getNotaProdutoAgenda(item) {
+    return String(item?.notaProduto || item?.notaFiscal || '').trim();
+}
+
+function getNotaPaleteAgenda(item) {
+    return String(item?.notaPalete || '').trim();
+}
+
+function normalizarNotasAgendaLegado(item) {
+    if (!item) return;
+    if (!item.notaProduto && item.notaFiscal) item.notaProduto = item.notaFiscal;
+    if (!item.notaFiscal && item.notaProduto) item.notaFiscal = item.notaProduto;
 }
 
 function buscarAgendaPendenteMesmoVeiculo(motorista, placa) {
@@ -3397,11 +3416,13 @@ function alternarAgendaTransportadora() {
 
 function atualizarCamposAgendaTransportadora() {
     const tipo = document.getElementById('agendaTipo')?.value;
-    const nf = document.getElementById('agendaNotaFiscal');
-    const nfLabel = document.getElementById('agendaNotaFiscalLabel');
+    const notaProduto = document.getElementById('agendaNotaProduto');
+    const notaPalete = document.getElementById('agendaNotaPalete');
+    const notaFiscalAntiga = document.getElementById('agendaNotaFiscal');
     const cliente = document.getElementById('agendaCliente');
-    if (nf) nf.placeholder = tipo === 'descarrego' ? 'Obrigatoria para descarrego' : 'Obrigatoria na baixa da NOVA CARGA';
-    if (nfLabel) nfLabel.classList.toggle('required', tipo === 'descarrego');
+    if (notaProduto) notaProduto.placeholder = tipo === 'descarrego' ? 'NF do produto no descarrego' : 'NF do produto para carregar';
+    if (notaPalete) notaPalete.placeholder = tipo === 'descarrego' ? 'NF de palete no descarrego' : 'NF de palete para carregar';
+    if (notaFiscalAntiga) notaFiscalAntiga.value = notaProduto?.value || '';
     if (cliente) cliente.placeholder = tipo === 'descarrego' ? 'Cliente do descarrego' : 'Cliente que vai fazer a coleta';
 }
 
@@ -3409,7 +3430,7 @@ function abrirModalAgendaTransportadora() {
     if (!podeCriarAgenda()) { mostrarToast('Acesso restrito!', 'error'); return; }
     carregarSelects();
     document.getElementById('modalAgendaTransportadora').style.display = 'flex';
-    ['agendaTransportadoraNome', 'agendaMotorista', 'agendaPlaca', 'agendaQuantidade', 'agendaNotaFiscal', 'agendaCliente', 'agendaObservacoes'].forEach(id => {
+    ['agendaTransportadoraNome', 'agendaMotorista', 'agendaPlaca', 'agendaQuantidade', 'agendaNotaProduto', 'agendaNotaPalete', 'agendaNotaFiscal', 'agendaCliente', 'agendaObservacoes'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
@@ -3430,7 +3451,11 @@ function salvarAgendaTransportadora() {
     const veiculo = document.getElementById('agendaVeiculo').value;
     const tipoCarga = document.getElementById('agendaTipoCarga').value;
     const quantidade = parseInt(document.getElementById('agendaQuantidade').value) || 0;
-    const notaFiscal = document.getElementById('agendaNotaFiscal').value.trim();
+    const notaProduto = document.getElementById('agendaNotaProduto').value.trim();
+    const notaPalete = document.getElementById('agendaNotaPalete').value.trim();
+    const notaFiscal = notaProduto;
+    const notaFiscalAntiga = document.getElementById('agendaNotaFiscal');
+    if (notaFiscalAntiga) notaFiscalAntiga.value = notaProduto;
     const cliente = document.getElementById('agendaCliente').value.trim();
     const observacoes = document.getElementById('agendaObservacoes').value.trim();
 
@@ -3442,15 +3467,19 @@ function salvarAgendaTransportadora() {
         mostrarToast('Informe o cliente da agenda.', 'error');
         return;
     }
-    if (tipo === 'descarrego' && !notaFiscal) {
-        mostrarToast('Para descarrego, informe a nota fiscal.', 'error');
+    if (!notaProduto || !notaPalete) {
+        mostrarToast('Informe a nota fiscal do produto e a nota fiscal de palete.', 'error');
+        return;
+    }
+    if (normalizarAgendaValor(notaProduto) === normalizarAgendaValor(notaPalete)) {
+        mostrarToast('Nota fiscal do produto e nota fiscal de palete nao podem ser iguais.', 'error');
         return;
     }
     if (!validarFrotaInterlandia(transportadora, motorista, placa)) {
         return;
     }
-    if (notaFiscal && notaFiscalJaUsada(notaFiscal)) {
-        mostrarToast('Nota fiscal ja cadastrada em outra carga ou agendamento. Cada cliente precisa ter sua propria nota.', 'error');
+    if (notaFiscalJaUsada(notaProduto) || notaFiscalJaUsada(notaPalete)) {
+        mostrarToast('Nota fiscal ja cadastrada em outra carga ou agendamento. Cada cliente precisa ter suas proprias notas.', 'error');
         return;
     }
     const agendaPendente = buscarAgendaPendenteMesmoVeiculo(motorista, placa);
@@ -3470,6 +3499,8 @@ function salvarAgendaTransportadora() {
         tipoCarga,
         quantidade,
         notaFiscal,
+        notaProduto,
+        notaPalete,
         cliente,
         observacoes,
         status: 'PENDENTE',
@@ -3501,9 +3532,10 @@ function getTransportadoraPorNomeAgenda(nome) {
 
 function sincronizarCargaDaAgenda(item) {
     if (!item || item.tipo !== 'coleta') return false;
-    const notaFiscal = String(item.notaFiscal || '').trim();
+    const notaFiscal = getNotaProdutoAgenda(item);
+    const notaPalete = getNotaPaleteAgenda(item);
     const clienteNome = String(item.cliente || '').trim();
-    if (!notaFiscal || !clienteNome) return false;
+    if (!notaFiscal || !notaPalete || !clienteNome) return false;
 
     const existente = bancoDados.cargas.find(c =>
         normalizarAgendaValor(c.notaFiscal) === normalizarAgendaValor(notaFiscal) &&
@@ -3515,7 +3547,8 @@ function sincronizarCargaDaAgenda(item) {
         if (!existente.motorista) existente.motorista = item.motorista || '';
         if (!existente.placa) existente.placa = item.placa || '';
         if (!existente.transportadoraNome) existente.transportadoraNome = item.transportadora || '';
-        registrarAlteracao(existente, 'Vinculou baixa de agenda', `Agenda ${item.id}`);
+        if (!existente.notaPalete) existente.notaPalete = notaPalete;
+        registrarAlteracao(existente, 'Vinculou baixa de agenda', `Agenda ${item.id}. NF palete ${notaPalete}`);
         return false;
     }
 
@@ -3527,6 +3560,7 @@ function sincronizarCargaDaAgenda(item) {
         usuarioId: usuarioAtual?.id || null,
         usuarioNome: usuarioLogadoNome(),
         notaFiscal,
+        notaPalete,
         sap: '',
         clienteId: cliente?.id || null,
         clienteNome,
@@ -3549,12 +3583,12 @@ function sincronizarCargaDaAgenda(item) {
         dataSaidaColeta: null,
         dataRetornoColeta: null,
         status: 'ABERTO',
-        observacoes: `Criado pela baixa do agendamento ${item.id}`,
+        observacoes: `Criado pela baixa do agendamento ${item.id}. NF palete: ${notaPalete}`,
         motivoVale: '',
         motivoNaoColetado: '',
         agendaTransportadoraId: item.id
     };
-    registrarAlteracao(novaCarga, 'Criou carga por baixa de agenda', `Agenda ${item.id}`);
+    registrarAlteracao(novaCarga, 'Criou carga por baixa de agenda', `Agenda ${item.id}. NF produto ${notaFiscal}. NF palete ${notaPalete}`);
     bancoDados.cargas.push(novaCarga);
     return true;
 }
@@ -3566,6 +3600,8 @@ function baixarAgendaTransportadora(id) {
     const antes = {
         cliente: item.cliente || '',
         notaFiscal: item.notaFiscal || '',
+        notaProduto: item.notaProduto || '',
+        notaPalete: item.notaPalete || '',
         status: item.status,
         dataBaixa: item.dataBaixa,
         diasBaixa: item.diasBaixa,
@@ -3582,15 +3618,26 @@ function baixarAgendaTransportadora(id) {
         item.cliente = cliente.trim();
     }
     if (!item.cliente) { mostrarToast('Informe o cliente para dar baixa.', 'error'); return; }
-    if (!String(item.notaFiscal || '').trim()) {
-        const notaFiscal = prompt('Nota fiscal da carga (obrigatoria para baixa):', item.notaFiscal || '');
-        if (notaFiscal === null) { cancelarBaixa(); return; }
-        item.notaFiscal = notaFiscal.trim();
+    if (!getNotaProdutoAgenda(item)) {
+        const notaProduto = prompt('Nota fiscal do produto (obrigatoria para baixa):', item.notaProduto || item.notaFiscal || '');
+        if (notaProduto === null) { cancelarBaixa(); return; }
+        item.notaProduto = notaProduto.trim();
+        item.notaFiscal = item.notaProduto;
     }
-    if (!item.notaFiscal) { mostrarToast('Informe a nota fiscal para dar baixa.', 'error'); return; }
-    if (notaFiscalJaUsada(item.notaFiscal, item.id)) {
+    if (!getNotaPaleteAgenda(item)) {
+        const notaPalete = prompt('Nota fiscal de palete (obrigatoria para baixa):', item.notaPalete || '');
+        if (notaPalete === null) { cancelarBaixa(); return; }
+        item.notaPalete = notaPalete.trim();
+    }
+    if (!getNotaProdutoAgenda(item) || !getNotaPaleteAgenda(item)) { mostrarToast('Informe a nota fiscal do produto e a nota fiscal de palete para dar baixa.', 'error'); return; }
+    if (normalizarAgendaValor(getNotaProdutoAgenda(item)) === normalizarAgendaValor(getNotaPaleteAgenda(item))) {
         Object.assign(item, antes);
-        mostrarToast('Nota fiscal ja usada em outra carga ou agendamento. Informe uma nota fiscal diferente.', 'error');
+        mostrarToast('Nota fiscal do produto e nota fiscal de palete nao podem ser iguais.', 'error');
+        return;
+    }
+    if (notaFiscalJaUsada(getNotaProdutoAgenda(item), item.id) || notaFiscalJaUsada(getNotaPaleteAgenda(item), item.id)) {
+        Object.assign(item, antes);
+        mostrarToast('Nota fiscal ja usada em outra carga ou agendamento. Informe notas fiscais diferentes.', 'error');
         return;
     }
     const obs = prompt('Observacao da baixa (opcional):');
@@ -3634,6 +3681,7 @@ function atualizarAgendaTransportadora() {
                 <div class="agenda-board-item">
                     <strong>${htmlSeguro(item.placa || '-')}</strong> - ${htmlSeguro(item.motorista || '-')}<br>
                     ${item.tipo === 'descarrego' ? 'Descarrego' : 'NOVA CARGA'} | ${htmlSeguro(item.cliente || '-')}<br>
+                    NF Produto: ${htmlSeguro(getNotaProdutoAgenda(item) || '-')} | NF Palete: ${htmlSeguro(getNotaPaleteAgenda(item) || '-')}<br>
                     ${htmlSeguro(item.veiculo || '-')} | ${htmlSeguro(item.tipoCarga || '-')} | Qtde ${item.quantidade || 0}<br>
                     <small>${formatarDataHoraAgenda(item.dataAgenda)}${item.dataBaixa ? ' | Baixa: ' + formatarDataHoraAgenda(item.dataBaixa) : ''}</small>
                 </div>
@@ -3667,7 +3715,7 @@ function atualizarAgendaTransportadora() {
                 <thead>
                     <tr>
                         <th>Status</th><th>Agenda</th><th>Tipo</th><th>Transportadora</th><th>Motorista</th>
-                        <th>Placa/Veiculo</th><th>Carga</th><th>Qtde</th><th>NF</th><th>Cliente</th>
+                        <th>Placa/Veiculo</th><th>Carga</th><th>Qtde</th><th>NF Produto</th><th>NF Palete</th><th>Cliente</th>
                         <th>Dias</th><th>Baixa</th><th>Acoes</th>
                     </tr>
                 </thead>
@@ -3685,7 +3733,8 @@ function atualizarAgendaTransportadora() {
                                 <td><strong>${htmlSeguro(item.placa)}</strong><br><small>${htmlSeguro(item.veiculo)}</small></td>
                                 <td>${htmlSeguro(item.tipoCarga)}</td>
                                 <td>${item.quantidade || 0}</td>
-                                <td>${htmlSeguro(item.notaFiscal || '-')}</td>
+                                <td>${htmlSeguro(getNotaProdutoAgenda(item) || '-')}</td>
+                                <td>${htmlSeguro(getNotaPaleteAgenda(item) || '-')}</td>
                                 <td>${htmlSeguro(item.cliente || '-')}</td>
                                 <td><strong>${dias}</strong></td>
                                 <td>${item.dataBaixa ? `${formatarDataHoraAgenda(item.dataBaixa)}<br><small>${htmlSeguro(item.baixaPor || '')}</small>` : '-'}</td>
