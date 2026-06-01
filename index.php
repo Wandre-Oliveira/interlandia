@@ -2532,6 +2532,153 @@
             border-left: 4px solid var(--dragao-green-700) !important;
         }
 
+        #dashboardGrid.dashboard-horizontal {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)) !important;
+            gap: 14px !important;
+            align-items: stretch !important;
+            margin: 18px 0 !important;
+        }
+
+        #dashboardGrid .stat-card {
+            --kpi-color: #2f8d5e;
+            position: relative;
+            min-height: 142px;
+            padding: 18px !important;
+            border: 1px solid #dce8e1 !important;
+            border-left: 5px solid var(--kpi-color) !important;
+            border-top: 1px solid #dce8e1 !important;
+            border-radius: 8px !important;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.98), rgba(250,252,251,.98)) !important;
+            box-shadow: 0 12px 26px rgba(36, 69, 52, .08) !important;
+            overflow: hidden;
+        }
+
+        #dashboardGrid .stat-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 0 auto 0;
+            height: 3px;
+            background: var(--kpi-color);
+            opacity: .9;
+        }
+
+        #dashboardGrid .stat-card:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 18px 38px rgba(36, 69, 52, .13) !important;
+        }
+
+        #dashboardGrid .stat-card.kpi-total { --kpi-color: #ed1c24; }
+        #dashboardGrid .stat-card.kpi-aberto { --kpi-color: #d69b16; }
+        #dashboardGrid .stat-card.kpi-concluido { --kpi-color: #23834f; }
+        #dashboardGrid .stat-card.kpi-vale { --kpi-color: #7c3aed; }
+        #dashboardGrid .stat-card.kpi-alerta { --kpi-color: #d9365f; }
+        #dashboardGrid .stat-card.kpi-coleta { --kpi-color: #0f7c8a; }
+        #dashboardGrid .stat-card.kpi-clientes { --kpi-color: #44615f; }
+
+        #dashboardGrid .stat-header {
+            margin-bottom: 10px !important;
+            gap: 10px;
+        }
+
+        #dashboardGrid .stat-header i {
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: #f3faf6;
+            color: var(--kpi-color) !important;
+            font-size: 17px !important;
+        }
+
+        #dashboardGrid .stat-title {
+            color: #586c62 !important;
+            font-size: 11px !important;
+            font-weight: 900 !important;
+            text-transform: uppercase;
+            letter-spacing: .04em !important;
+            line-height: 1.25;
+        }
+
+        #dashboardGrid .stat-value {
+            color: var(--kpi-color) !important;
+            font-size: 34px !important;
+            line-height: 1 !important;
+            font-weight: 900 !important;
+            margin-top: 0 !important;
+        }
+
+        #dashboardGrid .stat-detalhe {
+            color: #61756b !important;
+            font-size: 12px !important;
+            line-height: 1.35 !important;
+        }
+
+        #dashboardGrid .clientes-horizontal {
+            grid-column: span 2;
+            min-height: 190px;
+        }
+
+        #dashboardGrid .clientes-row {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 8px !important;
+            max-height: 230px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        #dashboardGrid .cliente-palete-card {
+            background: #ffffff !important;
+            border: 1px solid #e2ece6 !important;
+            border-radius: 8px !important;
+            padding: 10px 12px !important;
+            box-shadow: none !important;
+        }
+
+        #dashboardGrid .stat-cliente-item {
+            gap: 10px;
+        }
+
+        #dashboardGrid .stat-cliente-nome {
+            color: #173126 !important;
+            font-size: 12px !important;
+            max-width: 100%;
+        }
+
+        #dashboardGrid .stat-cliente-valor {
+            color: var(--dragao-red-dark) !important;
+            white-space: nowrap;
+        }
+
+        #dashboardGrid .stat-palete-dist {
+            gap: 5px !important;
+            margin-top: 8px !important;
+        }
+
+        #dashboardGrid .stat-palete-item {
+            background: #f3faf6 !important;
+            border: 1px solid #d9e7df;
+            color: #466156 !important;
+            border-radius: 999px !important;
+            padding: 3px 8px !important;
+            font-size: 10px !important;
+            font-weight: 800;
+        }
+
+        @media (max-width: 720px) {
+            #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: 1fr !important;
+            }
+
+            #dashboardGrid .clientes-horizontal {
+                grid-column: span 1;
+            }
+        }
+
         .modal-close {
             background: var(--dragao-green-100) !important;
             color: var(--dragao-green-900) !important;
@@ -3527,7 +3674,7 @@ function atualizarDashboard() {
         `).join('');
     
     document.getElementById('dashboardGrid').innerHTML = `
-        <div class="stat-card card-destaque">
+        <div class="stat-card kpi-total">
             <div class="stat-header"><span class="stat-title">📦 TOTAL PALETES</span><i class="fas fa-boxes"></i></div>
             <div class="stat-value">${totalPaletes}</div>
             <div class="stat-detalhe">Paletes registrados no sistema</div>
@@ -3575,6 +3722,15 @@ function atualizarDashboard() {
             </div>
         </div>
     `;
+    const cardsDashboard = document.querySelectorAll('#dashboardGrid > .stat-card');
+    const classesDashboard = ['kpi-total', 'kpi-aberto', 'kpi-concluido', 'kpi-vale', 'kpi-clientes', 'kpi-alerta', 'kpi-coleta', 'kpi-vale', 'kpi-clientes'];
+    const titulosDashboard = ['Total de paletes', 'Cargas abertas', 'Concluidas', 'Vale palete', 'Clientes com vale', 'Paletes a resgatar', 'Em coleta', 'Clientes com vale palete', 'Paletes por cliente'];
+    cardsDashboard.forEach((card, index) => {
+        card.classList.remove('card-destaque');
+        if (classesDashboard[index]) card.classList.add(classesDashboard[index]);
+        const titulo = card.querySelector('.stat-title');
+        if (titulo && titulosDashboard[index]) titulo.textContent = titulosDashboard[index];
+    });
 }
 
 // ============================================
