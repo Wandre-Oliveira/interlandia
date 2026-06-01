@@ -2542,6 +2542,29 @@
             color: var(--dragao-ink) !important;
         }
 
+        .permissoes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 8px;
+        }
+
+        .permissao-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 10px;
+            border: 1px solid var(--dragao-line);
+            border-radius: 8px;
+            background: var(--dragao-panel-soft);
+            color: var(--dragao-ink);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .permissao-item input {
+            width: auto !important;
+        }
+
         @media (max-width: 768px) {
             body {
                 background:
@@ -2631,6 +2654,7 @@
             <button class="btn-action btn-action-purple" id="btnSaidaColeta" onclick="abrirModalSaidaColeta()"><i class="fas fa-truck"></i> SAÍDA PARA COLETAR VALE</button>
             <button class="btn-action btn-action-info" id="btnRetornoColeta" onclick="abrirModalRetornoColeta()"><i class="fas fa-undo-alt"></i> RETORNO DE COLETA</button>
             <button class="btn-action btn-action-success" id="btnAgendaTransportadora" onclick="alternarAgendaTransportadora()"><i class="fas fa-calendar-check"></i> AGENDA TRANSPORTADORA</button>
+            <button class="btn-action btn-action-info" id="btnCadastroMotorista" onclick="abrirModalCadastroMotorista()"><i class="fas fa-id-card"></i> CADASTRAR MOTORISTA</button>
             <button class="btn-action btn-action-secondary" id="btnExportarRelatorio" onclick="exportarRelatorio()"><i class="fas fa-file-excel"></i> EXPORTAR RELATÓRIO</button>
         </div>
 
@@ -2817,6 +2841,18 @@
     <button class="btn-login" onclick="salvarTransportadora()">Salvar</button>
 </div></div></div>
 
+<div id="modalCadastroMotorista" class="modal"><div class="modal-content"><div class="modal-header"><h2><i class="fas fa-id-card"></i> CADASTRAR MOTORISTA</h2><span class="modal-close" onclick="fecharModal('modalCadastroMotorista')">&times;</span></div><div class="modal-body">
+    <div class="form-row"><div class="form-group"><label>Transportadora</label><input type="text" id="motoristaTransportadoraNome" readonly></div><div class="form-group"><label class="required">Nome do motorista</label><input type="text" id="motoristaNomeCadastro"></div></div>
+    <div class="form-row"><div class="form-group"><label>CPF</label><input type="text" id="motoristaCPF"></div><div class="form-group"><label class="required">CNH</label><input type="text" id="motoristaCNH"></div></div>
+    <div class="form-row"><div class="form-group"><label>Telefone</label><input type="text" id="motoristaTelefone"></div><div class="form-group"><label>Validade CNH</label><input type="date" id="motoristaValidadeCNH"></div></div>
+    <div class="form-row"><div class="form-group"><label class="required">Tipo de veiculo</label><select id="motoristaTipoVeiculo"><option value="Truck">Truck</option><option value="Carreta">Carreta</option><option value="Caminhao">Caminhao</option></select></div><div class="form-group"><label class="required">Placa principal</label><input type="text" id="motoristaPlacaPrincipal"></div></div>
+    <div class="form-row"><div class="form-group"><label>Placa carreta</label><input type="text" id="motoristaPlacaCarreta"></div><div class="form-group"><label>Modelo/Marca</label><input type="text" id="motoristaModeloVeiculo"></div></div>
+    <div class="form-row"><div class="form-group"><label>Ano</label><input type="number" id="motoristaAnoVeiculo"></div><div class="form-group"><label>Renavam</label><input type="text" id="motoristaRenavam"></div></div>
+    <div class="form-group"><label>Observacoes</label><textarea id="motoristaObservacoes" rows="3" placeholder="Dados adicionais da carreta, truck, documentos ou contato"></textarea></div>
+    <button class="btn-login" onclick="salvarCadastroMotorista()"><i class="fas fa-save"></i> Salvar motorista</button>
+    <hr><div id="listaMotoristasTransportadora"></div>
+</div></div></div>
+
 <div id="modalRepresentante" class="modal"><div class="modal-content"><div class="modal-header"><h2>Cadastrar Representante</h2><span class="modal-close" onclick="fecharModal('modalRepresentante')">&times;</span></div><div class="modal-body">
     <div class="form-group"><label class="required">Nome</label><input type="text" id="repNome"></div>
     <div class="form-group"><label>Telefone</label><input type="text" id="repTelefone"></div>
@@ -2830,11 +2866,13 @@
     <div class="form-row"><div class="form-group"><label>Usuário</label><input type="text" id="novoUser"></div><div class="form-group"><label>Senha</label><input type="text" id="novaSenha"></div></div>
     <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="novoNome"></div><div class="form-group"><label>Perfil</label><select id="novoPerfil"><option value="user">👤 Motorista</option><option value="conferente">📋 Conferente</option><option value="encarregado">📦 Encarregado</option><option value="almoxarifado">🏭 Almoxarifado</option><option value="transportadora">🚚 Transportadora</option><option value="faturamento">🧾 Faturamento</option><option value="master">👑 Master</option></select></div></div>
     <div class="form-group"><label>Transportadora vinculada</label><select id="novoTransportadoraUsuario"><option value="">Selecione apenas para perfil Transportadora</option></select></div>
+    <div class="form-group"><label>Permissoes</label><div id="novoPermissoesUsuario" class="permissoes-grid"></div></div>
     <button class="btn-login" onclick="criarUsuario()">Criar</button>
     <hr><div id="editarUsuarioPanel" style="display:none;"><h3>Editar Usuário</h3><input type="hidden" id="editUserId">
     <div class="form-row"><div class="form-group"><label>Usuário</label><input type="text" id="editUserName"></div><div class="form-group"><label>Senha</label><input type="text" id="editUserPassword"></div></div>
     <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="editUserNome"></div><div class="form-group"><label>Perfil</label><select id="editUserPerfil"><option value="user">Motorista</option><option value="conferente">Conferente</option><option value="encarregado">Encarregado</option><option value="almoxarifado">Almoxarifado</option><option value="transportadora">Transportadora</option><option value="faturamento">Faturamento</option><option value="master">Master</option></select></div></div>
     <div class="form-group"><label>Transportadora vinculada</label><select id="editUserTransportadora"><option value="">Selecione apenas para perfil Transportadora</option></select></div>
+    <div class="form-group"><label>Permissoes</label><div id="editPermissoesUsuario" class="permissoes-grid"></div></div>
     <button class="btn-login" onclick="salvarEdicaoUsuario()">Salvar</button>
     <button class="btn-login" style="background:#6c757d;" onclick="cancelarEdicaoUsuario()">Cancelar</button></div>
 </div></div></div>
@@ -2912,7 +2950,8 @@ let bancoDados = {
         { id: 4, notaFiscal: "NF-2025004", sap: "1050", clienteId: 4, clienteNome: "SUPERMERCADO DA FAMILIA", cnpj: "98.765.432/0001-10", endereco: "RUA DAS FLORES, 50", uf: "PE", representanteId: 2, representanteNome: "MARCOS ALVES", transportadoraId: 1, transportadoraNome: "INTERLANDIA", tipo: "nao_paletizada", qtde: 16, valorUnitario: 100, valorTotal: 1600, motorista: "ROBERTO", placa: "ROB-1234", dataCarga: new Date(Date.now() - 20*24*60*60*1000).toISOString(), dataRetorno: null, dataSaidaColeta: null, dataRetornoColeta: null, status: "ABERTO", observacoes: "", motivoVale: "", motivoNaoColetado: "" },
         { id: 5, notaFiscal: "NF-2025005", sap: "1066", clienteId: 1, clienteNome: "ATACADAO S/A", cnpj: "75.315.333/0312-50", endereco: "RODOVIA PE, 7KM", uf: "PE", representanteId: 1, representanteNome: "DIOGO DANTAS", transportadoraId: 2, transportadoraNome: "WELLITON", tipo: "paletizada", qtde: 56, valorUnitario: 150, valorTotal: 8400, motorista: "EDUARDO", placa: "EDU-5678", dataCarga: new Date(Date.now() - 12*24*60*60*1000).toISOString(), dataRetorno: new Date(Date.now() - 8*24*60*60*1000).toISOString(), dataSaidaColeta: null, dataRetornoColeta: null, status: "CONCLUÍDO", observacoes: "", motivoVale: "", motivoNaoColetado: "" }
     ],
-    agendaTransportadora: []
+    agendaTransportadora: [],
+    motoristasTransportadora: []
 };
 
 const bancoDadosPadrao = JSON.parse(JSON.stringify(bancoDados));
@@ -2934,6 +2973,41 @@ let agendaTempoRealTimer = null;
 let mysqlAtivo = false;
 let salvandoMysql = false;
 
+const PERMISSOES_SISTEMA = {
+    cadastrarBasico: 'Cadastrar clientes/transportadoras/representantes',
+    operarCargas: 'Operar nova carga e retorno',
+    criarAgenda: 'Criar agenda transportadora',
+    baixarAgenda: 'Dar baixa na agenda',
+    cadastrarMotorista: 'Cadastrar motorista/veiculo',
+    exportarRelatorio: 'Exportar relatorio',
+    saidaColeta: 'Saida para coletar vale',
+    retornoColeta: 'Retorno de coleta',
+    importarBackup: 'Importar backup/CSV',
+    gerarBackup: 'Gerar backup',
+    resetDemo: 'Restaurar demo'
+};
+
+const PERMISSOES_PADRAO = {
+    master: Object.fromEntries(Object.keys(PERMISSOES_SISTEMA).map(k => [k, true])),
+    faturamento: { cadastrarBasico: true, exportarRelatorio: true },
+    user: { operarCargas: true, exportarRelatorio: true },
+    conferente: { operarCargas: true, exportarRelatorio: true },
+    transportadora: { criarAgenda: true, cadastrarMotorista: true },
+    encarregado: { baixarAgenda: true },
+    almoxarifado: { baixarAgenda: true }
+};
+
+function permissoesPadraoPorPerfil(role) {
+    return { ...(PERMISSOES_PADRAO[role] || {}) };
+}
+
+function temPermissao(chave, user = usuarioAtual) {
+    if (!user) return false;
+    if (user.role === 'master') return true;
+    if (Object.prototype.hasOwnProperty.call(user.permissoes || {}, chave)) return user.permissoes[chave] === true;
+    return permissoesPadraoPorPerfil(user.role)[chave] === true;
+}
+
 function garantirEstruturaBanco() {
     if (!Array.isArray(bancoDados.users)) bancoDados.users = [];
     if (!Array.isArray(bancoDados.clientes)) bancoDados.clientes = [];
@@ -2941,6 +3015,8 @@ function garantirEstruturaBanco() {
     if (!Array.isArray(bancoDados.representantes)) bancoDados.representantes = [];
     if (!Array.isArray(bancoDados.cargas)) bancoDados.cargas = [];
     if (!Array.isArray(bancoDados.agendaTransportadora)) bancoDados.agendaTransportadora = [];
+    if (!Array.isArray(bancoDados.motoristasTransportadora)) bancoDados.motoristasTransportadora = [];
+    bancoDados.users.forEach(u => { if (!u.permissoes) u.permissoes = permissoesPadraoPorPerfil(u.role); });
     garantirUsuarioPadrao("encarregado", "123456", "encarregado", "Encarregado");
     garantirUsuarioPadrao("almoxarifado", "123456", "almoxarifado", "Almoxarifado");
     garantirUsuarioPadrao("transportadora", "123456", "transportadora", "Transportadora");
@@ -2951,7 +3027,7 @@ function garantirEstruturaBanco() {
 function garantirUsuarioPadrao(username, password, role, nome) {
     if (bancoDados.users.some(u => u.username === username)) return;
     const id = bancoDados.users.reduce((maior, u) => Math.max(maior, Number(u.id) || 0), 0) + 1;
-    bancoDados.users.push({ id, username, password, role, nome });
+    bancoDados.users.push({ id, username, password, role, nome, permissoes: permissoesPadraoPorPerfil(role) });
 }
 
 function vincularUsuarioTransportadoraPadrao(username, nomeTransportadora) {
@@ -3056,11 +3132,12 @@ function isTransportadora() { return getRoleAtual() === 'transportadora'; }
 function isEncarregadoOuAlmoxarifado() { return ['encarregado', 'almoxarifado'].includes(getRoleAtual()); }
 function usuarioSomenteAgenda() { return isTransportadora() || isEncarregadoOuAlmoxarifado(); }
 function podeVerAgenda() { return !!usuarioAtual; }
-function podeCadastrarBasico() { return isMaster() || isFaturamento(); }
-function podeCriarAgenda() { return isMaster() || isTransportadora(); }
-function podeBaixarAgenda() { return isMaster() || isEncarregadoOuAlmoxarifado(); }
-function podeOperarCargas() { return isMaster() || ['user', 'conferente'].includes(getRoleAtual()); }
-function podeExportarRelatorio() { return !usuarioSomenteAgenda(); }
+function podeCadastrarBasico() { return temPermissao('cadastrarBasico'); }
+function podeCriarAgenda() { return temPermissao('criarAgenda'); }
+function podeBaixarAgenda() { return temPermissao('baixarAgenda'); }
+function podeOperarCargas() { return temPermissao('operarCargas'); }
+function podeExportarRelatorio() { return temPermissao('exportarRelatorio'); }
+function podeCadastrarMotoristaTransportadora() { return isTransportadora() && temPermissao('cadastrarMotorista'); }
 function getPerfilLabel(role) { const perfis = { master: '👑 Master', user: '👤 Motorista', conferente: '📋 Conferente', encarregado: '📦 Encarregado', almoxarifado: '🏭 Almoxarifado', transportadora: '🚚 Transportadora', faturamento: '🧾 Faturamento' }; return perfis[role] || role; }
 function getPerfilColor(role) { const cores = { master: '#daa520', user: '#28a745', conferente: '#8b5cf6', encarregado: '#0891b2', almoxarifado: '#0f766e', transportadora: '#2563eb', faturamento: '#b45309' }; return cores[role] || '#8a9dc0'; }
 function getTransportadoraUsuarioAtual(user = usuarioAtual) {
@@ -3214,8 +3291,10 @@ function verificarTransportadoraSelecionada() {
     if (dlP && frota.length) dlP.innerHTML = frota.map(f => `<option value="${f.carro}">`).join('');
     if (!frota.length) atualizarListas();
     if (frota.length === 1) {
-        document.getElementById('cargaMotorista').value = frota[0].motorista || '';
-        document.getElementById('cargaPlaca').value = frota[0].carro || '';
+        const motoristaInput = document.getElementById('cargaMotorista');
+        const placaInput = document.getElementById('cargaPlaca');
+        if (!motoristaInput.value.trim()) motoristaInput.value = frota[0].motorista || '';
+        if (!placaInput.value.trim()) placaInput.value = frota[0].carro || '';
         document.getElementById('cargaMotorista').dispatchEvent(new Event('input'));
     }
 }
@@ -3230,12 +3309,13 @@ function preencherCarroPorMotorista() {
 function carregarSelects() {
     const clientes = bancoDados.clientes;
     const s = document.getElementById('cargaClienteSelect');
-    if (s) { s.innerHTML = '<option value="">Selecione</option>'; clientes.forEach(c => { s.innerHTML += `<option value="${c.id}" data-cnpj="${c.cnpj}" data-uf="${c.uf}" data-cidade="${c.cidade || ''}" data-endereco="${c.endereco}">${c.razao}</option>`; }); }
+    const valorClienteAtual = s?.value || '';
+    if (s) { s.innerHTML = '<option value="">Selecione</option>'; clientes.forEach(c => { s.innerHTML += `<option value="${c.id}" data-cnpj="${c.cnpj}" data-uf="${c.uf}" data-cidade="${c.cidade || ''}" data-endereco="${c.endereco}">${c.razao}</option>`; }); if (valorClienteAtual && [...s.options].some(o => o.value === valorClienteAtual)) s.value = valorClienteAtual; }
     const es = document.getElementById('editClienteSelect');
     if (es) { es.innerHTML = '<option value="">Selecione</option>'; clientes.forEach(c => { es.innerHTML += `<option value="${c.id}" data-cnpj="${c.cnpj}" data-uf="${c.uf}" data-cidade="${c.cidade || ''}" data-endereco="${c.endereco}">${c.razao}</option>`; }); es.onchange = function() { const o = es.options[es.selectedIndex]; if (o.value) { document.getElementById('editCnpj').value = o.getAttribute('data-cnpj') || ''; document.getElementById('editUf').value = o.getAttribute('data-uf') || ''; document.getElementById('editCidade').value = o.getAttribute('data-cidade') || ''; document.getElementById('editEndereco').value = o.getAttribute('data-endereco') || ''; } }; }
-    const reps = bancoDados.representantes; const r = document.getElementById('cargaRepresentanteSelect'); if (r) { r.innerHTML = '<option value="">Selecione</option>'; reps.forEach(rp => { r.innerHTML += `<option value="${rp.id}">${rp.nome}</option>`; }); }
+    const reps = bancoDados.representantes; const r = document.getElementById('cargaRepresentanteSelect'); const valorRepAtual = r?.value || ''; if (r) { r.innerHTML = '<option value="">Selecione</option>'; reps.forEach(rp => { r.innerHTML += `<option value="${rp.id}">${rp.nome}</option>`; }); if (valorRepAtual && [...r.options].some(o => o.value === valorRepAtual)) r.value = valorRepAtual; }
     const er = document.getElementById('editRepresentanteSelect'); if (er) { er.innerHTML = '<option value="">Selecione</option>'; reps.forEach(rp => { er.innerHTML += `<option value="${rp.id}">${rp.nome}</option>`; }); }
-    const transps = bancoDados.transportadoras; const t = document.getElementById('cargaTransportadoraSelect'); if (t) { t.innerHTML = '<option value="">Selecione</option>'; transps.forEach(tp => { t.innerHTML += `<option value="${tp.id}">${tp.nome}</option>`; }); }
+    const transps = bancoDados.transportadoras; const t = document.getElementById('cargaTransportadoraSelect'); const valorTranspAtual = t?.value || ''; if (t) { t.innerHTML = '<option value="">Selecione</option>'; transps.forEach(tp => { t.innerHTML += `<option value="${tp.id}">${tp.nome}</option>`; }); if (valorTranspAtual && [...t.options].some(o => o.value === valorTranspAtual)) t.value = valorTranspAtual; }
     const et = document.getElementById('editTransportadoraSelect'); if (et) { et.innerHTML = '<option value="">Selecione</option>'; transps.forEach(tp => { et.innerHTML += `<option value="${tp.id}">${tp.nome}</option>`; }); }
     const fc = document.getElementById('filtroCliente'); if (fc) { fc.innerHTML = '<option>Todos os clientes</option>'; clientes.forEach(c => { fc.innerHTML += `<option value="${c.razao}">${c.razao}</option>`; }); }
     const ufs = [...new Set(clientes.map(c => c.uf).filter(u => u))];
@@ -3290,15 +3370,16 @@ function aplicarPermissoesTela() {
     setDisplayById('btnAdminCliente', podeCadastrarBasico());
     setDisplayById('btnAdminTransportadora', podeCadastrarBasico());
     setDisplayById('btnAdminRepresentante', podeCadastrarBasico());
-    setDisplayById('btnAdminImportar', isMaster());
-    setDisplayById('btnAdminBackup', isMaster());
-    setDisplayById('btnAdminReset', isMaster());
+    setDisplayById('btnAdminImportar', temPermissao('importarBackup'));
+    setDisplayById('btnAdminBackup', temPermissao('gerarBackup'));
+    setDisplayById('btnAdminReset', temPermissao('resetDemo'));
 
     setDisplayById('btnNovaCarga', podeOperarCargas(), 'flex');
     setDisplayById('btnRetornoCarga', podeOperarCargas(), 'flex');
-    setDisplayById('btnSaidaColeta', isMaster(), 'flex');
-    setDisplayById('btnRetornoColeta', isMaster(), 'flex');
+    setDisplayById('btnSaidaColeta', temPermissao('saidaColeta'), 'flex');
+    setDisplayById('btnRetornoColeta', temPermissao('retornoColeta'), 'flex');
     setDisplayById('btnAgendaTransportadora', podeVerAgenda(), 'flex');
+    setDisplayById('btnCadastroMotorista', podeCadastrarMotoristaTransportadora(), 'flex');
     setDisplayById('btnExportarRelatorio', podeExportarRelatorio(), 'flex');
     setDisplayById('btnNovoAgendaTransportadora', podeCriarAgenda(), '');
 
@@ -3563,7 +3644,7 @@ function confirmarRetorno() {
 // ============================================
 // SAÍDA PARA COLETAR VALE
 // ============================================
-function abrirModalSaidaColeta() { if (!isMaster()) { mostrarToast('Apenas Master!', 'error'); return; } document.getElementById('modalSaidaColeta').style.display = 'flex'; document.getElementById('buscaSaidaNF').value = ''; document.getElementById('valesLista').innerHTML = ''; document.getElementById('saidaData').valueAsDate = new Date(); document.getElementById('dadosValeSaida').style.display = 'none'; cargaSelecionadaSaida = null; }
+function abrirModalSaidaColeta() { if (!temPermissao('saidaColeta')) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalSaidaColeta').style.display = 'flex'; document.getElementById('buscaSaidaNF').value = ''; document.getElementById('valesLista').innerHTML = ''; document.getElementById('saidaData').valueAsDate = new Date(); document.getElementById('dadosValeSaida').style.display = 'none'; cargaSelecionadaSaida = null; }
 function buscarValeParaSaida() { const b = document.getElementById('buscaSaidaNF').value.trim(); const vales = bancoDados.cargas.filter(c => c.status === 'VALE PALLETE' && (c.notaFiscal.toLowerCase().includes(b.toLowerCase()) || (c.sap && c.sap.includes(b)))); const div = document.getElementById('valesLista'); if (b.length < 2) { div.innerHTML = '<p style="color:#8a9dc0;">Digite pelo menos 2 caracteres</p>'; return; } if (!vales.length) { div.innerHTML = '<p style="color:#8a9dc0;">Nenhum vale encontrado</p>'; return; } div.innerHTML = vales.map(c => `<div onclick="selecionarValeSaida(${c.id})" style="padding:10px; border:1px solid #2a3a4a; border-radius:8px; margin-bottom:8px; cursor:pointer;"><strong>SAP: ${c.sap || '-'}</strong> | NF: ${c.notaFiscal}<br>Cliente: ${c.clienteNome}<br>Cidade: ${getCidadeCarga(c) || '-'}</div>`).join(''); }
 function selecionarValeSaida(id) { cargaSelecionadaSaida = bancoDados.cargas.find(c => c.id === id); document.getElementById('dadosValeSaida').style.display = 'block'; document.getElementById('dadosValeSaida').innerHTML = `<strong>VALE:</strong> SAP: ${cargaSelecionadaSaida.sap || '-'}<br>NF: ${cargaSelecionadaSaida.notaFiscal}<br>Cliente: ${cargaSelecionadaSaida.clienteNome}<br>Cidade: ${getCidadeCarga(cargaSelecionadaSaida) || '-'}`; }
 function confirmarSaidaColeta() {
@@ -3583,7 +3664,7 @@ function confirmarSaidaColeta() {
 // ============================================
 // RETORNO DE COLETA
 // ============================================
-function abrirModalRetornoColeta() { if (!isMaster()) { mostrarToast('Apenas Master!', 'error'); return; } document.getElementById('modalRetornoColeta').style.display = 'flex'; document.getElementById('buscaRetornoNFColeta').value = ''; document.getElementById('emColetaLista').innerHTML = ''; document.getElementById('retornoColetaData').valueAsDate = new Date(); document.getElementById('dadosRetornoColeta').style.display = 'none'; document.getElementById('motivoNaoColetadoDiv').style.display = 'none'; cargaSelecionadaRetornoColeta = null; opcaoRetornoColetaSelecionada = null; document.querySelectorAll('#opcoesRetornoColeta .opcao-retorno').forEach(opt => opt.classList.remove('selected')); }
+function abrirModalRetornoColeta() { if (!temPermissao('retornoColeta')) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalRetornoColeta').style.display = 'flex'; document.getElementById('buscaRetornoNFColeta').value = ''; document.getElementById('emColetaLista').innerHTML = ''; document.getElementById('retornoColetaData').valueAsDate = new Date(); document.getElementById('dadosRetornoColeta').style.display = 'none'; document.getElementById('motivoNaoColetadoDiv').style.display = 'none'; cargaSelecionadaRetornoColeta = null; opcaoRetornoColetaSelecionada = null; document.querySelectorAll('#opcoesRetornoColeta .opcao-retorno').forEach(opt => opt.classList.remove('selected')); }
 function buscarEmColetaParaRetorno() { const b = document.getElementById('buscaRetornoNFColeta').value.trim(); const em = bancoDados.cargas.filter(c => c.status === 'EM COLETA' && (c.notaFiscal.toLowerCase().includes(b.toLowerCase()) || (c.sap && c.sap.includes(b)))); const div = document.getElementById('emColetaLista'); if (b.length < 2) { div.innerHTML = '<p style="color:#8a9dc0;">Digite pelo menos 2 caracteres</p>'; return; } if (!em.length) { div.innerHTML = '<p style="color:#8a9dc0;">Nenhuma coleta em andamento</p>'; return; } div.innerHTML = em.map(c => `<div onclick="selecionarCargaRetornoColeta(${c.id})" style="padding:10px; border:1px solid #2a3a4a; border-radius:8px; margin-bottom:8px; cursor:pointer;"><strong>SAP: ${c.sap || '-'}</strong> | NF: ${c.notaFiscal}<br>Cliente: ${c.clienteNome}<br>Cidade: ${getCidadeCarga(c) || '-'}</div>`).join(''); }
 function selecionarCargaRetornoColeta(id) { cargaSelecionadaRetornoColeta = bancoDados.cargas.find(c => c.id === id); document.getElementById('dadosRetornoColeta').style.display = 'block'; document.getElementById('dadosRetornoColeta').innerHTML = `<strong>CARGA:</strong> SAP: ${cargaSelecionadaRetornoColeta.sap || '-'}<br>NF: ${cargaSelecionadaRetornoColeta.notaFiscal}<br>Cliente: ${cargaSelecionadaRetornoColeta.clienteNome}<br>Cidade: ${getCidadeCarga(cargaSelecionadaRetornoColeta) || '-'}`; }
 function selecionarOpcaoRetornoColeta(opcao) { opcaoRetornoColetaSelecionada = opcao; document.querySelectorAll('#opcoesRetornoColeta .opcao-retorno').forEach(opt => opt.classList.remove('selected')); if (opcao === 'coletado') { document.getElementById('opcaoColetado').classList.add('selected'); document.getElementById('motivoNaoColetadoDiv').style.display = 'none'; } else { document.getElementById('opcaoNaoColetado').classList.add('selected'); document.getElementById('motivoNaoColetadoDiv').style.display = 'block'; } }
@@ -3822,6 +3903,79 @@ function salvarTransportadora() {
     if (!validarFrotaInterlandiaLista(n, frota)) return;
     bancoDados.transportadoras.push({ id: bancoDados.transportadoras.length + 1, nome: n, cnpj: document.getElementById('transpCNPJ').value, telefone: document.getElementById('transpTelefone').value, contato: document.getElementById('transpContato').value, frota });
     salvarBanco(); carregarSelects(); fecharModal('modalTransportadora'); mostrarToast(`Transportadora ${n} cadastrada!`);
+}
+function getMotoristasTransportadoraAtual() {
+    const transportadora = getTransportadoraUsuarioAtual();
+    if (!transportadora) return [];
+    return bancoDados.motoristasTransportadora.filter(m => Number(m.transportadoraId) === Number(transportadora.id));
+}
+function renderizarMotoristasTransportadora() {
+    const lista = document.getElementById('listaMotoristasTransportadora');
+    if (!lista) return;
+    const motoristas = getMotoristasTransportadoraAtual();
+    lista.innerHTML = `<h3>Motoristas cadastrados</h3>` + (motoristas.length ? motoristas.map(m => `
+        <div class="registro-card">
+            <strong>${htmlSeguro(m.nome)}</strong> | CNH: ${htmlSeguro(m.cnh || '-')}<br>
+            <small>${htmlSeguro(m.tipoVeiculo || '-')} | Placa: ${htmlSeguro(m.placaPrincipal || '-')} | Carreta: ${htmlSeguro(m.placaCarreta || '-')}</small>
+        </div>
+    `).join('') : '<div class="agenda-empty">Nenhum motorista cadastrado para sua transportadora.</div>');
+}
+function abrirModalCadastroMotorista() {
+    if (!podeCadastrarMotoristaTransportadora()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    const transportadora = getTransportadoraUsuarioAtual();
+    if (!transportadora) { mostrarToast('Usuario sem transportadora vinculada.', 'error'); return; }
+    document.getElementById('modalCadastroMotorista').style.display = 'flex';
+    document.querySelectorAll('#modalCadastroMotorista input, #modalCadastroMotorista textarea').forEach(i => i.value = '');
+    document.getElementById('motoristaTipoVeiculo').value = 'Truck';
+    document.getElementById('motoristaTransportadoraNome').value = transportadora.nome;
+    renderizarMotoristasTransportadora();
+}
+function salvarCadastroMotorista() {
+    if (!podeCadastrarMotoristaTransportadora()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    const transportadora = getTransportadoraUsuarioAtual();
+    if (!transportadora) { mostrarToast('Usuario sem transportadora vinculada.', 'error'); return; }
+    const nome = document.getElementById('motoristaNomeCadastro').value.trim();
+    const cnh = document.getElementById('motoristaCNH').value.trim();
+    const placaPrincipal = document.getElementById('motoristaPlacaPrincipal').value.trim().toUpperCase();
+    const tipoVeiculo = document.getElementById('motoristaTipoVeiculo').value;
+    if (!nome || !cnh || !placaPrincipal) {
+        mostrarToast('Informe nome, CNH e placa principal.', 'error');
+        return;
+    }
+    if (!validarFrotaInterlandia(transportadora.nome, nome, placaPrincipal)) return;
+    const cadastro = {
+        id: proximoId(bancoDados.motoristasTransportadora),
+        transportadoraId: transportadora.id,
+        transportadoraNome: transportadora.nome,
+        nome,
+        cpf: document.getElementById('motoristaCPF').value.trim(),
+        cnh,
+        telefone: document.getElementById('motoristaTelefone').value.trim(),
+        validadeCNH: document.getElementById('motoristaValidadeCNH').value,
+        tipoVeiculo,
+        placaPrincipal,
+        placaCarreta: document.getElementById('motoristaPlacaCarreta').value.trim().toUpperCase(),
+        modeloVeiculo: document.getElementById('motoristaModeloVeiculo').value.trim(),
+        anoVeiculo: document.getElementById('motoristaAnoVeiculo').value,
+        renavam: document.getElementById('motoristaRenavam').value.trim(),
+        observacoes: document.getElementById('motoristaObservacoes').value.trim(),
+        criadoEm: new Date().toISOString(),
+        criadoPor: usuarioLogadoNome()
+    };
+    bancoDados.motoristasTransportadora = bancoDados.motoristasTransportadora.filter(m =>
+        !(Number(m.transportadoraId) === Number(transportadora.id) && normalizarAgendaValor(m.nome) === normalizarAgendaValor(nome))
+    );
+    bancoDados.motoristasTransportadora.push(cadastro);
+    if (!Array.isArray(transportadora.frota)) transportadora.frota = [];
+    const frotaExistente = transportadora.frota.find(f => normalizarAgendaValor(f.motorista) === normalizarAgendaValor(nome));
+    const frotaDados = { motorista: nome, carro: placaPrincipal, cnh, tipoVeiculo, placaCarreta: cadastro.placaCarreta };
+    if (frotaExistente) Object.assign(frotaExistente, frotaDados);
+    else transportadora.frota.push(frotaDados);
+    salvarBanco();
+    atualizarListas();
+    renderizarMotoristasTransportadora();
+    document.querySelectorAll('#modalCadastroMotorista input:not(#motoristaTransportadoraNome), #modalCadastroMotorista textarea').forEach(i => i.value = '');
+    mostrarToast('Motorista cadastrado!');
 }
 function abrirModalRepresentante() { if (!podeCadastrarBasico()) { mostrarToast('Acesso restrito!', 'error'); return; } document.getElementById('modalRepresentante').style.display = 'flex'; document.querySelectorAll('#modalRepresentante input').forEach(i => i.value = ''); }
 function salvarRepresentante() { if (!podeCadastrarBasico()) { mostrarToast('Acesso restrito!', 'error'); return; } const n = document.getElementById('repNome').value.trim(); if (!n) { mostrarToast('Informe o nome!', 'error'); return; } bancoDados.representantes.push({ id: bancoDados.representantes.length + 1, nome: n, telefone: document.getElementById('repTelefone').value, email: document.getElementById('repEmail').value, regiao: document.getElementById('repRegiao').value }); salvarBanco(); carregarSelects(); fecharModal('modalRepresentante'); mostrarToast(`Representante ${n} cadastrado!`); }
@@ -4323,7 +4477,7 @@ function salvarEdicaoUsuario() { const id = parseInt(document.getElementById('ed
 function cancelarEdicaoUsuario() { document.getElementById('editarUsuarioPanel').style.display = 'none'; document.getElementById('editUserId').value = ''; document.getElementById('editUserName').value = ''; document.getElementById('editUserPassword').value = ''; document.getElementById('editUserNome').value = ''; }
 function criarUsuario() { const u = document.getElementById('novoUser').value.trim(); const p = document.getElementById('novaSenha').value.trim(); const n = document.getElementById('novoNome').value.trim(); const r = document.getElementById('novoPerfil').value; if (!u || !p) { mostrarToast('Preencha usuário e senha!', 'error'); return; } if (bancoDados.users.find(us => us.username === u)) { mostrarToast('Usuário já existe!', 'error'); return; } bancoDados.users.push({ id: bancoDados.users.length + 1, username: u, password: p, role: r, nome: n || u }); salvarBanco(); atualizarListaUsuarios(); document.getElementById('novoUser').value = ''; document.getElementById('novaSenha').value = ''; document.getElementById('novoNome').value = ''; mostrarToast(`Usuário ${u} criado!`); }
 function excluirUsuario(id) { if (id === 1) { mostrarToast('Não pode excluir o Master!', 'error'); return; } bancoDados.users = bancoDados.users.filter(u => u.id !== id); salvarBanco(); atualizarListaUsuarios(); mostrarToast('Usuário excluído!'); }
-function gerarBackup() { if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; } const b = JSON.stringify(bancoDados, null, 2); const blob = new Blob([b], { type: "application/json" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `backup_${new Date().toISOString().slice(0,19)}.json`; link.click(); mostrarToast('Backup gerado!'); }
+function gerarBackup() { if (!temPermissao('gerarBackup')) { mostrarToast('Acesso restrito!', 'error'); return; } const b = JSON.stringify(bancoDados, null, 2); const blob = new Blob([b], { type: "application/json" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `backup_${new Date().toISOString().slice(0,19)}.json`; link.click(); mostrarToast('Backup gerado!'); }
 
 
 function opcoesTransportadoraUsuario(valorAtual = '') {
@@ -4342,10 +4496,28 @@ function getDadosVinculoTransportadoraUsuario(selectId, role) {
     if (!transportadora) return null;
     return { transportadoraId: transportadora.id, transportadoraNome: transportadora.nome };
 }
+function renderizarPermissoesUsuario(containerId, permissoes = {}, role = 'user') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const padrao = permissoesPadraoPorPerfil(role);
+    container.innerHTML = Object.entries(PERMISSOES_SISTEMA).map(([chave, label]) => {
+        const marcado = Object.prototype.hasOwnProperty.call(permissoes || {}, chave) ? permissoes[chave] === true : padrao[chave] === true;
+        return `<label class="permissao-item"><input type="checkbox" data-permissao="${chave}" ${marcado ? 'checked' : ''}> ${label}</label>`;
+    }).join('');
+}
+function lerPermissoesUsuario(containerId) {
+    const permissoes = {};
+    document.querySelectorAll(`#${containerId} [data-permissao]`).forEach(input => {
+        permissoes[input.getAttribute('data-permissao')] = input.checked;
+    });
+    return permissoes;
+}
 function abrirModalUsuarios() {
     if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; }
     popularSelectTransportadoraUsuario('novoTransportadoraUsuario');
     popularSelectTransportadoraUsuario('editUserTransportadora');
+    renderizarPermissoesUsuario('novoPermissoesUsuario', {}, document.getElementById('novoPerfil')?.value || 'user');
+    document.getElementById('novoPerfil').onchange = () => renderizarPermissoesUsuario('novoPermissoesUsuario', {}, document.getElementById('novoPerfil').value);
     atualizarListaUsuarios();
     document.getElementById('modalUsuarios').style.display = 'flex';
 }
@@ -4368,6 +4540,8 @@ function abrirEdicaoUsuario(id) {
     document.getElementById('editUserNome').value = user.nome;
     document.getElementById('editUserPerfil').value = user.role;
     popularSelectTransportadoraUsuario('editUserTransportadora', user.transportadoraId || getTransportadoraUsuarioAtual(user)?.id || '');
+    renderizarPermissoesUsuario('editPermissoesUsuario', user.permissoes || {}, user.role);
+    document.getElementById('editUserPerfil').onchange = () => renderizarPermissoesUsuario('editPermissoesUsuario', user.permissoes || {}, document.getElementById('editUserPerfil').value);
     document.getElementById('editarUsuarioPanel').style.display = 'block';
 }
 function salvarEdicaoUsuario() {
@@ -4388,6 +4562,7 @@ function salvarEdicaoUsuario() {
     user.role = nr;
     user.transportadoraId = vinculo?.transportadoraId || null;
     user.transportadoraNome = vinculo?.transportadoraNome || '';
+    user.permissoes = lerPermissoesUsuario('editPermissoesUsuario');
     salvarBanco();
     cancelarEdicaoUsuario();
     atualizarListaUsuarios();
@@ -4400,6 +4575,7 @@ function cancelarEdicaoUsuario() {
     document.getElementById('editUserPassword').value = '';
     document.getElementById('editUserNome').value = '';
     popularSelectTransportadoraUsuario('editUserTransportadora');
+    renderizarPermissoesUsuario('editPermissoesUsuario');
 }
 function criarUsuario() {
     const u = document.getElementById('novoUser').value.trim();
@@ -4410,13 +4586,14 @@ function criarUsuario() {
     if (!u || !p) { mostrarToast('Preencha usuario e senha!', 'error'); return; }
     if (r === 'transportadora' && !vinculo) { mostrarToast('Vincule o usuario a uma transportadora cadastrada.', 'error'); return; }
     if (bancoDados.users.find(us => us.username === u)) { mostrarToast('Usuario ja existe!', 'error'); return; }
-    bancoDados.users.push({ id: proximoId(bancoDados.users), username: u, password: p, role: r, nome: n || vinculo?.transportadoraNome || u, transportadoraId: vinculo?.transportadoraId || null, transportadoraNome: vinculo?.transportadoraNome || '' });
+    bancoDados.users.push({ id: proximoId(bancoDados.users), username: u, password: p, role: r, nome: n || vinculo?.transportadoraNome || u, transportadoraId: vinculo?.transportadoraId || null, transportadoraNome: vinculo?.transportadoraNome || '', permissoes: lerPermissoesUsuario('novoPermissoesUsuario') });
     salvarBanco();
     atualizarListaUsuarios();
     document.getElementById('novoUser').value = '';
     document.getElementById('novaSenha').value = '';
     document.getElementById('novoNome').value = '';
     popularSelectTransportadoraUsuario('novoTransportadoraUsuario');
+    renderizarPermissoesUsuario('novoPermissoesUsuario', {}, r);
     mostrarToast(`Usuario ${u} criado!`);
 }
 
@@ -4424,7 +4601,7 @@ function criarUsuario() {
 // IMPORTAÇÃO, ATALHOS E MELHORIAS
 // ============================================
 function abrirModalImportar() {
-    if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    if (!temPermissao('importarBackup')) { mostrarToast('Acesso restrito!', 'error'); return; }
     document.getElementById('modalImportar').style.display = 'flex';
     document.getElementById('arquivoImportar').value = '';
     document.getElementById('importarSubstituir').checked = false;
@@ -4434,7 +4611,7 @@ function normalizarCampo(v) { return String(v || '').trim(); }
 function proximoId(lista) { return (lista.reduce((m, i) => Math.max(m, Number(i.id)||0), 0) + 1); }
 
 function processarImportacao() {
-    if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    if (!temPermissao('importarBackup')) { mostrarToast('Acesso restrito!', 'error'); return; }
     const file = document.getElementById('arquivoImportar').files[0];
     if (!file) { mostrarToast('Selecione um arquivo!', 'error'); return; }
     const reader = new FileReader();
@@ -4503,7 +4680,7 @@ function processarImportacao() {
 }
 
 function resetarDadosDemo() {
-    if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    if (!temPermissao('resetDemo')) { mostrarToast('Acesso restrito!', 'error'); return; }
     if (!confirm('Restaurar os dados de demonstração? Isso substitui os dados salvos neste navegador.')) return;
     bancoDados = JSON.parse(JSON.stringify(bancoDadosPadrao));
     salvarBanco(); carregarSelects(); atualizarDashboard(); atualizarTabela(); mostrarToast('Dados de demonstração restaurados!', 'info');
