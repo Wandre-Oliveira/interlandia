@@ -2623,6 +2623,39 @@ function getFrotaTransportadora(transp) {
     if (transp.motorista || transp.carro || transp.placa) legado.push({ motorista: transp.motorista || '', carro: transp.carro || transp.placa || '' });
     return frota.concat(legado).filter(f => f.motorista || f.carro);
 }
+function isNomeInterlandia(nome) {
+    return normalizarAgendaValor(nome) === 'INTERLANDIA';
+}
+function getTransportadoraInterlandia() {
+    return bancoDados.transportadoras.find(t => isNomeInterlandia(t.nome));
+}
+function getFrotaInterlandia() {
+    return getFrotaTransportadora(getTransportadoraInterlandia());
+}
+function itemPertenceFrotaInterlandia(motorista, placa) {
+    const m = normalizarAgendaValor(motorista);
+    const p = normalizarAgendaValor(placa);
+    if (!m && !p) return null;
+    return getFrotaInterlandia().find(f =>
+        (m && normalizarAgendaValor(f.motorista) === m) ||
+        (p && normalizarAgendaValor(f.carro) === p)
+    ) || null;
+}
+function validarFrotaInterlandia(transportadoraNome, motorista, placa) {
+    if (isNomeInterlandia(transportadoraNome)) return true;
+    const item = itemPertenceFrotaInterlandia(motorista, placa);
+    if (!item) return true;
+    const dados = `${item.motorista || motorista || '-'} / ${item.carro || placa || '-'}`;
+    mostrarToast(`Motorista ou placa da INTERLANDIA nao pode ser associado a outra transportadora: ${dados}`, 'error');
+    return false;
+}
+function validarFrotaInterlandiaLista(transportadoraNome, frota) {
+    if (isNomeInterlandia(transportadoraNome)) return true;
+    for (const item of (frota || [])) {
+        if (!validarFrotaInterlandia(transportadoraNome, item.motorista, item.carro || item.placa)) return false;
+    }
+    return true;
+}
 function cargaTemIndicadorC(c) {
     return String(c.transportadoraNome || '').trim().toUpperCase() === 'INTERLANDIA' || String(c.observacoes || '').toUpperCase().includes('C - CARGA INTERLANDIA') || c.indicadorC === true;
 }
@@ -2634,8 +2667,8 @@ function fecharModal(id) { document.getElementById(id).style.display = 'none'; }
 
 function atualizarListas() {
     const frota = bancoDados.transportadoras.flatMap(t => getFrotaTransportadora(t));
-    listaMotoristasRegistrados = [...new Set(bancoDados.cargas.map(c => c.motorista).concat(frota.map(f => f.motorista)).filter(m => m))];
-    listaPlacasRegistradas = [...new Set(bancoDados.cargas.map(c => c.placa).concat(frota.map(f => f.carro)).filter(p => p))];
+    listaMotoristasRegistrados = [...new Set(bancoDados.cargas.map(c => c.motorista).concat(frota.map(f => f.motorista)).filter(m => m))].sort();
+    listaPlacasRegistradas = [...new Set(bancoDados.cargas.map(c => c.placa).concat(frota.map(f => f.carro)).filter(p => p))].sort();
     const dlM = document.getElementById('listaMotoristas');
     const dlP = document.getElementById('listaPlacas');
     if (dlM) dlM.innerHTML = listaMotoristasRegistrados.map(m => `<option value="${m}">`).join('');
@@ -2659,7 +2692,10 @@ function verificarTransportadoraSelecionada() {
     verificarTransportadoraInterlandia();
     const select = document.getElementById('cargaTransportadoraSelect');
     const transp = bancoDados.transportadoras.find(t => t.id == select.value);
-    const frota = getFrotaTransportadora(transp);
+    let frota = getFrotaTransportadora(transp);
+    if (transp && !isNomeInterlandia(transp.nome)) {
+        frota = frota.filter(f => !itemPertenceFrotaInterlandia(f.motorista, f.carro));
+    }
     const dlM = document.getElementById('listaMotoristas');
     const dlP = document.getElementById('listaPlacas');
     if (dlM && frota.length) dlM.innerHTML = frota.map(f => `<option value="${f.motorista}">`).join('');
@@ -2930,6 +2966,7 @@ function salvarNovaCarga() {
     const rnome = rid ? bancoDados.representantes.find(r => r.id == rid)?.nome : '';
     const tid = document.getElementById('cargaTransportadoraSelect').value;
     const tnome = tid ? bancoDados.transportadoras.find(t => t.id == tid)?.nome : '';
+    if (!validarFrotaInterlandia(tnome, motorista, placa)) return;
     let obs = '';
     if (tnome === "INTERLANDIA") obs = "C - Carga INTERLANDIA";
     const novaCarga = { id: bancoDados.cargas.length + 1, usuarioId: usuarioAtual.id, usuarioNome: usuarioAtual.nome, notaFiscal: nf, sap, clienteId: cid, clienteNome: cnome || cn, cnpj: ccnpj || document.getElementById('cargaCNPJ').value.trim(), endereco: cend || document.getElementById('cargaEndereco').value.trim(), cidade: ccidade || document.getElementById('cargaCidade').value.trim(), uf: cuf || document.getElementById('cargaUF').value.toUpperCase(), representanteId: rid || null, representanteNome: rnome || '', transportadoraId: tid || null, transportadoraNome: tnome || '', tipo, qtde, valorUnitario: vu, valorTotal: qtde * vu, motorista, placa, dataCarga: new Date().toISOString(), dataRetorno: null, dataSaidaColeta: null, dataRetornoColeta: null, status: "ABERTO", observacoes: obs, motivoVale: "", motivoNaoColetado: "", indicadorC: true };
@@ -3105,6 +3142,9 @@ function salvarEdicaoCarga() {
     const rnome = rid ? bancoDados.representantes.find(r => r.id == rid)?.nome : '';
     const tid = document.getElementById('editTransportadoraSelect').value;
     const tnome = tid ? bancoDados.transportadoras.find(t => t.id == tid)?.nome : '';
+    const motoristaEdit = document.getElementById('editMotorista').value.trim();
+    const placaEdit = document.getElementById('editPlaca').value.trim().toUpperCase();
+    if (!validarFrotaInterlandia(tnome, motoristaEdit, placaEdit)) return;
     carga.notaFiscal = nf;
     carga.sap = document.getElementById('editSap').value.trim();
     carga.clienteId = cid;
@@ -3117,8 +3157,8 @@ function salvarEdicaoCarga() {
     carga.representanteNome = rnome || '';
     carga.transportadoraId = tid || null;
     carga.transportadoraNome = tnome || '';
-    carga.motorista = document.getElementById('editMotorista').value;
-    carga.placa = document.getElementById('editPlaca').value;
+    carga.motorista = motoristaEdit;
+    carga.placa = placaEdit;
     carga.tipo = document.getElementById('editTipo').value;
     carga.qtde = parseInt(document.getElementById('editQtde').value);
     carga.valorUnitario = parseFloat(document.getElementById('editValorUnitario').value);
@@ -3263,6 +3303,7 @@ function salvarTransportadora() {
         const partes = texto.split(/\s+-\s+|\s*;\s*|\s*,\s*/);
         frota.push({ motorista: (partes[0] || '').trim(), carro: (partes.slice(1).join(' ') || '').trim().toUpperCase() });
     });
+    if (!validarFrotaInterlandiaLista(n, frota)) return;
     bancoDados.transportadoras.push({ id: bancoDados.transportadoras.length + 1, nome: n, cnpj: document.getElementById('transpCNPJ').value, telefone: document.getElementById('transpTelefone').value, contato: document.getElementById('transpContato').value, frota });
     salvarBanco(); carregarSelects(); fecharModal('modalTransportadora'); mostrarToast(`Transportadora ${n} cadastrada!`);
 }
@@ -3403,6 +3444,9 @@ function salvarAgendaTransportadora() {
     }
     if (tipo === 'descarrego' && !notaFiscal) {
         mostrarToast('Para descarrego, informe a nota fiscal.', 'error');
+        return;
+    }
+    if (!validarFrotaInterlandia(transportadora, motorista, placa)) {
         return;
     }
     if (notaFiscal && notaFiscalJaUsada(notaFiscal)) {
@@ -3692,11 +3736,18 @@ function processarImportacao() {
             if (file.name.toLowerCase().endsWith('.json')) {
                 const dados = JSON.parse(texto);
                 if (!dados.users || !dados.cargas || !dados.clientes) throw new Error('Backup inválido');
-                if (document.getElementById('importarSubstituir').checked) bancoDados = dados;
+                if (document.getElementById('importarSubstituir').checked) {
+                    const cargaInvalida = (dados.cargas || []).find(c => !validarFrotaInterlandia(c.transportadoraNome || '', c.motorista || '', c.placa || ''));
+                    const transportadoraInvalida = (dados.transportadoras || []).find(t => !validarFrotaInterlandiaLista(t.nome || '', getFrotaTransportadora(t)));
+                    if (cargaInvalida || transportadoraInvalida) throw new Error('Backup possui motorista ou placa da INTERLANDIA associado a outra transportadora');
+                    bancoDados = dados;
+                }
                 else {
-                    bancoDados.cargas = bancoDados.cargas.concat((dados.cargas || []).map(c => ({...c, id: proximoId(bancoDados.cargas)})));
+                    const cargasValidas = (dados.cargas || []).filter(c => validarFrotaInterlandia(c.transportadoraNome || '', c.motorista || '', c.placa || ''));
+                    const transportadorasValidas = (dados.transportadoras || []).filter(t => validarFrotaInterlandiaLista(t.nome || '', getFrotaTransportadora(t)));
+                    bancoDados.cargas = bancoDados.cargas.concat(cargasValidas.map(c => ({...c, id: proximoId(bancoDados.cargas)})));
                     bancoDados.clientes = bancoDados.clientes.concat((dados.clientes || []).filter(n => !bancoDados.clientes.some(c => c.cnpj === n.cnpj)).map(c => ({...c, id: proximoId(bancoDados.clientes)})));
-                    bancoDados.transportadoras = bancoDados.transportadoras.concat((dados.transportadoras || []).filter(n => !bancoDados.transportadoras.some(t => t.nome === n.nome)).map(t => ({...t, id: proximoId(bancoDados.transportadoras)})));
+                    bancoDados.transportadoras = bancoDados.transportadoras.concat(transportadorasValidas.filter(n => !bancoDados.transportadoras.some(t => t.nome === n.nome)).map(t => ({...t, id: proximoId(bancoDados.transportadoras)})));
                     bancoDados.representantes = bancoDados.representantes.concat((dados.representantes || []).filter(n => !bancoDados.representantes.some(r => r.nome === n.nome)).map(r => ({...r, id: proximoId(bancoDados.representantes)})));
                 }
                 salvarBanco(); carregarSelects(); atualizarDashboard(); atualizarTabela(); fecharModal('modalImportar'); mostrarToast('Backup importado com sucesso!');
@@ -3723,13 +3774,16 @@ function processarImportacao() {
                 }
                 const transpNome = normalizarCampo(col[map.transp]);
                 let transp = transpNome ? bancoDados.transportadoras.find(t => t.nome === transpNome) : null;
+                const motoristaCsv = normalizarCampo(col[map.motorista]);
+                const placaCsv = normalizarCampo(col[map.placa]).toUpperCase();
+                if (!validarFrotaInterlandia(transpNome, motoristaCsv, placaCsv)) { puladas++; return; }
                 if (transpNome && !transp) { transp = { id: proximoId(bancoDados.transportadoras), nome: transpNome, cnpj:'', telefone:'', contato:'' }; bancoDados.transportadoras.push(transp); }
                 const repNome = normalizarCampo(col[map.rep]);
                 let rep = repNome ? bancoDados.representantes.find(r => r.nome === repNome) : null;
                 if (repNome && !rep) { rep = { id: proximoId(bancoDados.representantes), nome: repNome, telefone:'', email:'', regiao:'' }; bancoDados.representantes.push(rep); }
                 const qtde = parseInt(normalizarCampo(col[map.qtde]).replace(/\D/g,'')) || 0;
                 const valorTotal = parseFloat(normalizarCampo(col[map.valor]).replace('R$','').replace(/\./g,'').replace(',','.')) || 0;
-                const cargaImportada = { id: proximoId(bancoDados.cargas), notaFiscal:nf, sap:normalizarCampo(col[map.sap]), clienteId:cliente.id, clienteNome:cliente.razao, cnpj:cliente.cnpj, endereco:cliente.endereco, cidade: cliente.cidade || normalizarCampo(col[map.cidade]), uf:cliente.uf || normalizarCampo(col[map.uf]).toUpperCase(), representanteId:rep?.id||null, representanteNome:rep?.nome||'', transportadoraId:transp?.id||null, transportadoraNome:transp?.nome||'', tipo: qtde > 0 ? 'paletizada':'nao_paletizada', qtde, valorUnitario: qtde ? valorTotal/qtde : valorTotal, valorTotal, motorista:normalizarCampo(col[map.motorista]), placa:normalizarCampo(col[map.placa]).toUpperCase(), dataCarga:new Date().toISOString(), dataRetorno:null, dataSaidaColeta:null, dataRetornoColeta:null, status:'ABERTO', observacoes:'Importado via CSV', motivoVale:'', motivoNaoColetado:'' };
+                const cargaImportada = { id: proximoId(bancoDados.cargas), notaFiscal:nf, sap:normalizarCampo(col[map.sap]), clienteId:cliente.id, clienteNome:cliente.razao, cnpj:cliente.cnpj, endereco:cliente.endereco, cidade: cliente.cidade || normalizarCampo(col[map.cidade]), uf:cliente.uf || normalizarCampo(col[map.uf]).toUpperCase(), representanteId:rep?.id||null, representanteNome:rep?.nome||'', transportadoraId:transp?.id||null, transportadoraNome:transp?.nome||'', tipo: qtde > 0 ? 'paletizada':'nao_paletizada', qtde, valorUnitario: qtde ? valorTotal/qtde : valorTotal, valorTotal, motorista:motoristaCsv, placa:placaCsv, dataCarga:new Date().toISOString(), dataRetorno:null, dataSaidaColeta:null, dataRetornoColeta:null, status:'ABERTO', observacoes:'Importado via CSV', motivoVale:'', motivoNaoColetado:'' };
                 registrarAlteracao(cargaImportada, 'Importou carga por CSV', `NF ${nf}`);
                 bancoDados.cargas.push(cargaImportada);
                 importadas++;
