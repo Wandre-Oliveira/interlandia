@@ -2829,10 +2829,12 @@
     <div id="listaUsuarios"></div><hr><h3>Novo Usuário</h3>
     <div class="form-row"><div class="form-group"><label>Usuário</label><input type="text" id="novoUser"></div><div class="form-group"><label>Senha</label><input type="text" id="novaSenha"></div></div>
     <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="novoNome"></div><div class="form-group"><label>Perfil</label><select id="novoPerfil"><option value="user">👤 Motorista</option><option value="conferente">📋 Conferente</option><option value="encarregado">📦 Encarregado</option><option value="almoxarifado">🏭 Almoxarifado</option><option value="transportadora">🚚 Transportadora</option><option value="faturamento">🧾 Faturamento</option><option value="master">👑 Master</option></select></div></div>
+    <div class="form-group"><label>Transportadora vinculada</label><select id="novoTransportadoraUsuario"><option value="">Selecione apenas para perfil Transportadora</option></select></div>
     <button class="btn-login" onclick="criarUsuario()">Criar</button>
     <hr><div id="editarUsuarioPanel" style="display:none;"><h3>Editar Usuário</h3><input type="hidden" id="editUserId">
     <div class="form-row"><div class="form-group"><label>Usuário</label><input type="text" id="editUserName"></div><div class="form-group"><label>Senha</label><input type="text" id="editUserPassword"></div></div>
     <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="editUserNome"></div><div class="form-group"><label>Perfil</label><select id="editUserPerfil"><option value="user">Motorista</option><option value="conferente">Conferente</option><option value="encarregado">Encarregado</option><option value="almoxarifado">Almoxarifado</option><option value="transportadora">Transportadora</option><option value="faturamento">Faturamento</option><option value="master">Master</option></select></div></div>
+    <div class="form-group"><label>Transportadora vinculada</label><select id="editUserTransportadora"><option value="">Selecione apenas para perfil Transportadora</option></select></div>
     <button class="btn-login" onclick="salvarEdicaoUsuario()">Salvar</button>
     <button class="btn-login" style="background:#6c757d;" onclick="cancelarEdicaoUsuario()">Cancelar</button></div>
 </div></div></div>
@@ -2943,12 +2945,23 @@ function garantirEstruturaBanco() {
     garantirUsuarioPadrao("almoxarifado", "123456", "almoxarifado", "Almoxarifado");
     garantirUsuarioPadrao("transportadora", "123456", "transportadora", "Transportadora");
     garantirUsuarioPadrao("faturamento", "123456", "faturamento", "Faturamento");
+    vincularUsuarioTransportadoraPadrao("transportadora", "WELLITON");
 }
 
 function garantirUsuarioPadrao(username, password, role, nome) {
     if (bancoDados.users.some(u => u.username === username)) return;
     const id = bancoDados.users.reduce((maior, u) => Math.max(maior, Number(u.id) || 0), 0) + 1;
     bancoDados.users.push({ id, username, password, role, nome });
+}
+
+function vincularUsuarioTransportadoraPadrao(username, nomeTransportadora) {
+    const user = bancoDados.users.find(u => u.username === username && u.role === 'transportadora');
+    if (!user || user.transportadoraId) return;
+    const transportadora = bancoDados.transportadoras.find(t => normalizarAgendaValor(t.nome) === normalizarAgendaValor(nomeTransportadora));
+    if (!transportadora) return;
+    user.transportadoraId = transportadora.id;
+    user.transportadoraNome = transportadora.nome;
+    if (!user.nome || normalizarAgendaValor(user.nome) === 'TRANSPORTADORA') user.nome = transportadora.nome;
 }
 
 function mostrarStatusMysql(txt, ok = true) {
@@ -3050,7 +3063,35 @@ function podeOperarCargas() { return isMaster() || ['user', 'conferente'].includ
 function podeExportarRelatorio() { return !usuarioSomenteAgenda(); }
 function getPerfilLabel(role) { const perfis = { master: '👑 Master', user: '👤 Motorista', conferente: '📋 Conferente', encarregado: '📦 Encarregado', almoxarifado: '🏭 Almoxarifado', transportadora: '🚚 Transportadora', faturamento: '🧾 Faturamento' }; return perfis[role] || role; }
 function getPerfilColor(role) { const cores = { master: '#daa520', user: '#28a745', conferente: '#8b5cf6', encarregado: '#0891b2', almoxarifado: '#0f766e', transportadora: '#2563eb', faturamento: '#b45309' }; return cores[role] || '#8a9dc0'; }
-function getTodasCargas() { return [...bancoDados.cargas]; }
+function getTransportadoraUsuarioAtual(user = usuarioAtual) {
+    if (!user || user.role !== 'transportadora') return null;
+    if (user.transportadoraId) {
+        const porId = bancoDados.transportadoras.find(t => Number(t.id) === Number(user.transportadoraId));
+        if (porId) return porId;
+    }
+    const nomesPossiveis = [user.transportadoraNome, user.nome, user.username].filter(Boolean).map(normalizarAgendaValor);
+    return bancoDados.transportadoras.find(t => nomesPossiveis.includes(normalizarAgendaValor(t.nome))) || null;
+}
+function registroPertenceTransportadoraAtual(nomeTransportadora, transportadoraId = null, user = usuarioAtual) {
+    if (!user || user.role !== 'transportadora') return true;
+    const transportadora = getTransportadoraUsuarioAtual(user);
+    if (!transportadora) return false;
+    if (transportadoraId && Number(transportadoraId) === Number(transportadora.id)) return true;
+    return normalizarAgendaValor(nomeTransportadora) === normalizarAgendaValor(transportadora.nome);
+}
+function agendaVisivelParaUsuario(item) {
+    return registroPertenceTransportadoraAtual(item?.transportadora, item?.transportadoraId);
+}
+function cargaVisivelParaUsuario(carga) {
+    return registroPertenceTransportadoraAtual(carga?.transportadoraNome, carga?.transportadoraId);
+}
+function filtrarAgendaPorPermissao(itens) {
+    return isTransportadora() ? itens.filter(agendaVisivelParaUsuario) : itens;
+}
+function filtrarCargasPorPermissao(cargas) {
+    return isTransportadora() ? cargas.filter(cargaVisivelParaUsuario) : cargas;
+}
+function getTodasCargas() { return filtrarCargasPorPermissao([...bancoDados.cargas]); }
 function usuarioLogadoNome() { return usuarioAtual?.nome || usuarioAtual?.username || 'Sistema'; }
 function registrarAlteracao(carga, acao, detalhes = '') {
     if (!carga) return;
@@ -3798,6 +3839,10 @@ function getAgendaTransportadora() {
     return bancoDados.agendaTransportadora;
 }
 
+function getAgendaTransportadoraVisivel() {
+    return filtrarAgendaPorPermissao(getAgendaTransportadora());
+}
+
 function normalizarAgendaValor(v) {
     return String(v || '').trim().toUpperCase();
 }
@@ -3828,15 +3873,21 @@ function normalizarNotasAgendaLegado(item) {
     if (!item) return;
     if (!item.notaProduto && item.notaFiscal) item.notaProduto = item.notaFiscal;
     if (!item.notaFiscal && item.notaProduto) item.notaFiscal = item.notaProduto;
+    if (!item.transportadoraId && item.transportadora) {
+        const transportadora = getTransportadoraPorNomeAgenda(item.transportadora);
+        if (transportadora) item.transportadoraId = transportadora.id;
+    }
 }
 
-function buscarAgendaPendenteMesmoVeiculo(motorista, placa) {
+function buscarAgendaPendenteMesmoVeiculo(motorista, placa, transportadoraNome = '') {
     const m = normalizarAgendaValor(motorista);
     const p = normalizarAgendaValor(placa);
+    const t = normalizarAgendaValor(transportadoraNome);
     if (!m || !p) return null;
     return getAgendaTransportadora().find(item =>
         normalizarAgendaValor(item.motorista) === m &&
         normalizarAgendaValor(item.placa) === p &&
+        (!t || normalizarAgendaValor(item.transportadora) === t) &&
         item.status !== 'BAIXADO'
     );
 }
@@ -3918,6 +3969,12 @@ function abrirModalAgendaTransportadora() {
     document.getElementById('agendaVeiculo').value = 'Caminhao';
     document.getElementById('agendaTipoCarga').value = 'Palete';
     document.getElementById('agendaData').value = formatarDataInputAgenda();
+    const inputTransportadora = document.getElementById('agendaTransportadoraNome');
+    if (inputTransportadora) {
+        const transportadoraUsuario = getTransportadoraUsuarioAtual();
+        inputTransportadora.readOnly = isTransportadora();
+        inputTransportadora.value = isTransportadora() ? (transportadoraUsuario?.nome || '') : '';
+    }
     atualizarCamposAgendaTransportadora();
 }
 
@@ -3925,7 +3982,17 @@ function salvarAgendaTransportadora() {
     if (!podeCriarAgenda()) { mostrarToast('Acesso restrito!', 'error'); return; }
     const tipo = document.getElementById('agendaTipo').value;
     const dataAgenda = document.getElementById('agendaData').value;
-    const transportadora = document.getElementById('agendaTransportadoraNome').value.trim();
+    let transportadora = document.getElementById('agendaTransportadoraNome').value.trim();
+    let transportadoraAgenda = getTransportadoraPorNomeAgenda(transportadora);
+    if (isTransportadora()) {
+        transportadoraAgenda = getTransportadoraUsuarioAtual();
+        if (!transportadoraAgenda) {
+            mostrarToast('Seu usuario de transportadora nao esta vinculado a uma transportadora cadastrada.', 'error');
+            return;
+        }
+        transportadora = transportadoraAgenda.nome;
+        document.getElementById('agendaTransportadoraNome').value = transportadora;
+    }
     const motorista = document.getElementById('agendaMotorista').value.trim();
     const placa = document.getElementById('agendaPlaca').value.trim().toUpperCase();
     const veiculo = document.getElementById('agendaVeiculo').value;
@@ -3964,7 +4031,7 @@ function salvarAgendaTransportadora() {
         mostrarToast('Nota fiscal ja cadastrada em outra carga ou agendamento. Cada cliente precisa ter suas proprias notas.', 'error');
         return;
     }
-    const agendaPendente = buscarAgendaPendenteMesmoVeiculo(motorista, placa);
+    const agendaPendente = buscarAgendaPendenteMesmoVeiculo(motorista, placa, transportadora);
     if (agendaPendente) {
         mostrarToast(`Este motorista e placa ja possuem agendamento pendente. So pode agendar novamente apos a baixa.`, 'error');
         return;
@@ -3974,6 +4041,7 @@ function salvarAgendaTransportadora() {
         id: proximoId(getAgendaTransportadora()),
         tipo,
         dataAgenda: new Date(dataAgenda).toISOString(),
+        transportadoraId: transportadoraAgenda?.id || null,
         transportadora,
         motorista,
         placa,
@@ -4143,7 +4211,22 @@ function atualizarAgendaTransportadora() {
     const board = document.getElementById('agendaBoardTransportadora');
     if (!resumo || !lista) return;
 
-    const itens = getAgendaTransportadora();
+    if (isTransportadora() && !getTransportadoraUsuarioAtual()) {
+        resumo.innerHTML = `
+            <div class="agenda-summary-card"><span>Pendentes</span><strong>0</strong></div>
+            <div class="agenda-summary-card"><span>Baixados</span><strong>0</strong></div>
+            <div class="agenda-summary-card"><span>Nova carga</span><strong>0</strong></div>
+            <div class="agenda-summary-card"><span>Descarregos</span><strong>0</strong></div>
+        `;
+        if (board) {
+            board.style.display = 'grid';
+            board.innerHTML = '<div class="agenda-empty">Seu usuario precisa estar vinculado a uma transportadora cadastrada.</div>';
+        }
+        lista.innerHTML = '<div class="agenda-empty">Nenhum agendamento disponivel para este usuario.</div>';
+        return;
+    }
+
+    const itens = getAgendaTransportadoraVisivel();
     const pendentes = itens.filter(i => i.status !== 'BAIXADO');
     const baixados = itens.filter(i => i.status === 'BAIXADO');
     const descarregos = itens.filter(i => i.tipo === 'descarrego');
@@ -4242,6 +4325,100 @@ function criarUsuario() { const u = document.getElementById('novoUser').value.tr
 function excluirUsuario(id) { if (id === 1) { mostrarToast('Não pode excluir o Master!', 'error'); return; } bancoDados.users = bancoDados.users.filter(u => u.id !== id); salvarBanco(); atualizarListaUsuarios(); mostrarToast('Usuário excluído!'); }
 function gerarBackup() { if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; } const b = JSON.stringify(bancoDados, null, 2); const blob = new Blob([b], { type: "application/json" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `backup_${new Date().toISOString().slice(0,19)}.json`; link.click(); mostrarToast('Backup gerado!'); }
 
+
+function opcoesTransportadoraUsuario(valorAtual = '') {
+    const selecionado = String(valorAtual || '');
+    return '<option value="">Selecione apenas para perfil Transportadora</option>' +
+        bancoDados.transportadoras.map(t => `<option value="${t.id}" ${String(t.id) === selecionado ? 'selected' : ''}>${htmlSeguro(t.nome)}</option>`).join('');
+}
+function popularSelectTransportadoraUsuario(id, valorAtual = '') {
+    const select = document.getElementById(id);
+    if (select) select.innerHTML = opcoesTransportadoraUsuario(valorAtual);
+}
+function getDadosVinculoTransportadoraUsuario(selectId, role) {
+    const id = document.getElementById(selectId)?.value || '';
+    if (role !== 'transportadora') return { transportadoraId: null, transportadoraNome: '' };
+    const transportadora = bancoDados.transportadoras.find(t => Number(t.id) === Number(id));
+    if (!transportadora) return null;
+    return { transportadoraId: transportadora.id, transportadoraNome: transportadora.nome };
+}
+function abrirModalUsuarios() {
+    if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    popularSelectTransportadoraUsuario('novoTransportadoraUsuario');
+    popularSelectTransportadoraUsuario('editUserTransportadora');
+    atualizarListaUsuarios();
+    document.getElementById('modalUsuarios').style.display = 'flex';
+}
+function atualizarListaUsuarios() {
+    const l = document.getElementById('listaUsuarios');
+    l.innerHTML = '<h3>Usuarios</h3>';
+    bancoDados.users.forEach(u => {
+        const vinculo = u.role === 'transportadora'
+            ? `<br><small>Transportadora: ${htmlSeguro(getTransportadoraUsuarioAtual(u)?.nome || 'Nao vinculada')}</small>`
+            : '';
+        l.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #2a3a4a;"><div><strong>${htmlSeguro(u.username)}</strong> <span style="color:${getPerfilColor(u.role)}">(${getPerfilLabel(u.role).replace(/^[^ ]+ /,'')})</span><br><small>Nome: ${htmlSeguro(u.nome)}</small>${vinculo}<br><small style="color:#8a9dc0;">Senha: ${htmlSeguro(u.password)}</small></div><div><button onclick="abrirEdicaoUsuario(${u.id})" style="background:#daa520; border:none; padding:4px 8px; border-radius:4px; margin-right:4px;">Editar</button>${u.id !== 1 ? `<button onclick="excluirUsuario(${u.id})" style="background:#dc3545; border:none; padding:4px 8px; border-radius:4px;">Excluir</button>` : '<span>Master</span>'}</div></div>`;
+    });
+}
+function abrirEdicaoUsuario(id) {
+    const user = bancoDados.users.find(u => u.id === id);
+    if (!user) return;
+    document.getElementById('editUserId').value = user.id;
+    document.getElementById('editUserName').value = user.username;
+    document.getElementById('editUserPassword').value = user.password;
+    document.getElementById('editUserNome').value = user.nome;
+    document.getElementById('editUserPerfil').value = user.role;
+    popularSelectTransportadoraUsuario('editUserTransportadora', user.transportadoraId || getTransportadoraUsuarioAtual(user)?.id || '');
+    document.getElementById('editarUsuarioPanel').style.display = 'block';
+}
+function salvarEdicaoUsuario() {
+    const id = parseInt(document.getElementById('editUserId').value);
+    const user = bancoDados.users.find(u => u.id === id);
+    if (!user) { mostrarToast('Usuario nao encontrado!', 'error'); return; }
+    const nu = document.getElementById('editUserName').value.trim();
+    const np = document.getElementById('editUserPassword').value.trim();
+    const nn = document.getElementById('editUserNome').value.trim();
+    const nr = document.getElementById('editUserPerfil').value;
+    const vinculo = getDadosVinculoTransportadoraUsuario('editUserTransportadora', nr);
+    if (!nu || !np) { mostrarToast('Usuario e senha obrigatorios!', 'error'); return; }
+    if (nr === 'transportadora' && !vinculo) { mostrarToast('Vincule o usuario a uma transportadora cadastrada.', 'error'); return; }
+    if (nu !== user.username && bancoDados.users.some(u => u.username === nu)) { mostrarToast('Usuario ja existe!', 'error'); return; }
+    user.username = nu;
+    user.password = np;
+    user.nome = nn || vinculo?.transportadoraNome || nu;
+    user.role = nr;
+    user.transportadoraId = vinculo?.transportadoraId || null;
+    user.transportadoraNome = vinculo?.transportadoraNome || '';
+    salvarBanco();
+    cancelarEdicaoUsuario();
+    atualizarListaUsuarios();
+    mostrarToast('Usuario atualizado!');
+}
+function cancelarEdicaoUsuario() {
+    document.getElementById('editarUsuarioPanel').style.display = 'none';
+    document.getElementById('editUserId').value = '';
+    document.getElementById('editUserName').value = '';
+    document.getElementById('editUserPassword').value = '';
+    document.getElementById('editUserNome').value = '';
+    popularSelectTransportadoraUsuario('editUserTransportadora');
+}
+function criarUsuario() {
+    const u = document.getElementById('novoUser').value.trim();
+    const p = document.getElementById('novaSenha').value.trim();
+    const n = document.getElementById('novoNome').value.trim();
+    const r = document.getElementById('novoPerfil').value;
+    const vinculo = getDadosVinculoTransportadoraUsuario('novoTransportadoraUsuario', r);
+    if (!u || !p) { mostrarToast('Preencha usuario e senha!', 'error'); return; }
+    if (r === 'transportadora' && !vinculo) { mostrarToast('Vincule o usuario a uma transportadora cadastrada.', 'error'); return; }
+    if (bancoDados.users.find(us => us.username === u)) { mostrarToast('Usuario ja existe!', 'error'); return; }
+    bancoDados.users.push({ id: proximoId(bancoDados.users), username: u, password: p, role: r, nome: n || vinculo?.transportadoraNome || u, transportadoraId: vinculo?.transportadoraId || null, transportadoraNome: vinculo?.transportadoraNome || '' });
+    salvarBanco();
+    atualizarListaUsuarios();
+    document.getElementById('novoUser').value = '';
+    document.getElementById('novaSenha').value = '';
+    document.getElementById('novoNome').value = '';
+    popularSelectTransportadoraUsuario('novoTransportadoraUsuario');
+    mostrarToast(`Usuario ${u} criado!`);
+}
 
 // ============================================
 // IMPORTAÇÃO, ATALHOS E MELHORIAS
