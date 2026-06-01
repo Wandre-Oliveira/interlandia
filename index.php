@@ -2532,6 +2532,121 @@
             border-left: 4px solid var(--dragao-green-700) !important;
         }
 
+        .layout-shell {
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr);
+            gap: 18px;
+            align-items: start;
+        }
+
+        .side-actions {
+            position: sticky;
+            top: 102px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: calc(100vh - 122px);
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .side-actions-panel {
+            background: rgba(255,255,255,.96) !important;
+            border: 1px solid var(--dragao-line) !important;
+            border-radius: 10px !important;
+            box-shadow: var(--dragao-shadow-sm) !important;
+            padding: 12px !important;
+        }
+
+        .side-actions-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 10px;
+            color: var(--dragao-green-900);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        .side-actions .admin-bar,
+        .side-actions .action-buttons {
+            display: flex !important;
+            flex-direction: column;
+            gap: 8px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .side-actions .admin-bar[style*="none"],
+        .side-actions .action-buttons[style*="none"] {
+            display: none !important;
+        }
+
+        .side-actions .admin-bar::before {
+            content: none !important;
+        }
+
+        .side-actions .btn-admin,
+        .side-actions .btn-action {
+            width: 100% !important;
+            min-height: 42px !important;
+            justify-content: flex-start !important;
+            padding: 10px 12px !important;
+            border-radius: 8px !important;
+            font-size: 12px !important;
+            text-align: left;
+            box-shadow: none !important;
+        }
+
+        .side-actions .btn-admin i,
+        .side-actions .btn-action i {
+            width: 18px;
+            text-align: center;
+        }
+
+        .side-actions .btn-action-secondary {
+            background: #ffffff !important;
+        }
+
+        .workspace-content {
+            min-width: 0;
+        }
+
+        @media (max-width: 1100px) {
+            .layout-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .side-actions {
+                position: static;
+                max-height: none;
+                overflow: visible;
+                padding-right: 0;
+            }
+
+            .side-actions-panel {
+                overflow-x: auto;
+            }
+
+            .side-actions .admin-bar,
+            .side-actions .action-buttons {
+                flex-direction: row;
+                flex-wrap: nowrap;
+                min-width: max-content;
+            }
+
+            .side-actions .btn-admin,
+            .side-actions .btn-action {
+                width: auto !important;
+                white-space: nowrap;
+            }
+        }
+
         #dashboardGrid.dashboard-horizontal {
             display: grid !important;
             grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)) !important;
@@ -2826,6 +2941,10 @@
             </div>
         </div>
         
+        <div class="layout-shell">
+            <aside class="side-actions">
+                <div class="side-actions-panel" id="adminActionsPanel">
+                    <div class="side-actions-title"><i class="fas fa-sliders-h"></i> Administracao</div>
         <!-- Admin Bar -->
         <div id="adminBar" class="admin-bar" style="display: none;">
             <button class="btn-admin" id="btnAdminUsuarios" onclick="abrirModalUsuarios()"><i class="fas fa-users"></i> Gerenciar Usuários</button>
@@ -2837,6 +2956,10 @@
             <button class="btn-admin" id="btnAdminReset" onclick="resetarDadosDemo()"><i class="fas fa-rotate-left"></i> Restaurar Demo</button>
         </div>
         
+                </div>
+
+                <div class="side-actions-panel">
+                    <div class="side-actions-title"><i class="fas fa-route"></i> Operacao</div>
         <!-- Action Buttons -->
         <div class="action-buttons">
             <button class="btn-action btn-action-primary" id="btnNovaCarga" onclick="abrirModalNovaCarga()"><i class="fas fa-boxes"></i> NOVA CARGA</button>
@@ -2848,6 +2971,10 @@
             <button class="btn-action btn-action-secondary" id="btnExportarRelatorio" onclick="exportarRelatorio()"><i class="fas fa-file-excel"></i> EXPORTAR RELATÓRIO</button>
         </div>
 
+                </div>
+            </aside>
+
+            <main class="workspace-content">
         <!-- Agenda Transportadora -->
         <section id="agendaTransportadoraPanel" class="agenda-panel">
             <div class="agenda-header">
@@ -2915,6 +3042,8 @@
                 </thead>
                 <tbody id="tabelaBody"><tr><td colspan="19" class="loading">📭 Carregando......</td></tr></tbody>
             </table>
+        </div>
+            </main>
         </div>
     </div>
 </div>
@@ -3573,6 +3702,7 @@ function setDisplaySelector(selector, mostrar, display = '') {
 function aplicarPermissoesTela() {
     const somenteAgenda = usuarioSomenteAgenda();
     const exibeAdmin = isMaster() || isFaturamento();
+    setDisplayById('adminActionsPanel', exibeAdmin);
     setDisplayById('adminBar', exibeAdmin, 'flex');
     setDisplayById('btnAdminUsuarios', isMaster());
     setDisplayById('btnAdminCliente', podeCadastrarBasico());
