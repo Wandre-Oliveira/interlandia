@@ -2097,6 +2097,472 @@
                 grid-template-columns: 1fr !important;
             }
         }
+
+        /* ===== IDENTIDADE DRAGAO PROFISSIONAL ===== */
+        :root {
+            --dragao-green-900: #174f37;
+            --dragao-green-800: #216846;
+            --dragao-green-700: #2f8d5e;
+            --dragao-green-100: #e7f4ec;
+            --dragao-green-050: #f3faf6;
+            --dragao-red: #ed1c24;
+            --dragao-red-dark: #b80f17;
+            --dragao-white: #ffffff;
+            --dragao-ink: #173126;
+            --dragao-muted: #66766e;
+            --dragao-line: #d9e7df;
+            --dragao-line-strong: #bdd6c7;
+            --dragao-panel: #ffffff;
+            --dragao-panel-soft: #f7fbf8;
+            --dragao-shadow-sm: 0 1px 2px rgba(23, 79, 55, .08);
+            --dragao-shadow-md: 0 14px 34px rgba(23, 79, 55, .12);
+            --dragao-shadow-lg: 0 26px 70px rgba(23, 79, 55, .18);
+        }
+
+        html,
+        body {
+            background: #eef7f1 !important;
+        }
+
+        body {
+            color: var(--dragao-ink) !important;
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.86) 0%, rgba(238,247,241,.96) 42%, rgba(231,244,236,.98) 100%),
+                url("assets/logo_dragao.jpg") right 28px top 26px / 92px auto no-repeat !important;
+        }
+
+        body::before {
+            display: block !important;
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background:
+                linear-gradient(90deg, rgba(47,141,94,.16), rgba(255,255,255,0) 34%),
+                linear-gradient(180deg, rgba(237,28,36,.05), rgba(255,255,255,0) 28%);
+        }
+
+        .login-screen {
+            background:
+                linear-gradient(90deg, rgba(22,89,57,.93) 0%, rgba(47,141,94,.88) 46%, rgba(238,247,241,.92) 100%),
+                url("assets/logo_dragao.jpg") center / min(430px, 58vw) auto no-repeat !important;
+            padding: 22px !important;
+        }
+
+        .login-card {
+            width: min(430px, calc(100vw - 34px)) !important;
+            background: rgba(255,255,255,.96) !important;
+            border: 1px solid rgba(255,255,255,.72) !important;
+            border-top: 5px solid var(--dragao-red) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 30px 90px rgba(12, 51, 34, .32) !important;
+        }
+
+        .login-logo .logo-placeholder {
+            width: 116px !important;
+            height: 116px !important;
+            margin: 0 auto 16px !important;
+            background: #ffffff !important;
+            border: 1px solid var(--dragao-line) !important;
+            box-shadow: var(--dragao-shadow-md) !important;
+        }
+
+        .logo-placeholder {
+            background: #ffffff !important;
+            border: 1px solid var(--dragao-line) !important;
+            box-shadow: var(--dragao-shadow-sm) !important;
+        }
+
+        .company-logo {
+            border: 0 !important;
+            background: #ffffff !important;
+            object-fit: contain !important;
+        }
+
+        .login-logo h2,
+        .logo-area h1,
+        .modal-header h2,
+        .filtros-header h3,
+        .agenda-header h3 {
+            color: var(--dragao-ink) !important;
+        }
+
+        .login-logo p,
+        .logo-area h1::after,
+        .user-info span,
+        .stat-title,
+        .stat-detalhe,
+        .form-group label,
+        .input-group label,
+        .agenda-header span,
+        .filtros-header span,
+        .loading,
+        .agenda-empty {
+            color: var(--dragao-muted) !important;
+        }
+
+        .main-wrapper {
+            max-width: 1800px !important;
+            padding: 20px !important;
+        }
+
+        .app-header {
+            background:
+                linear-gradient(90deg, var(--dragao-green-900), var(--dragao-green-700)) !important;
+            border: 0 !important;
+            border-radius: 12px !important;
+            box-shadow: var(--dragao-shadow-lg) !important;
+        }
+
+        .app-header .logo-area h1,
+        .app-header .logo-area h1::after,
+        .app-header .user-info h4,
+        .app-header .user-info span {
+            color: #ffffff !important;
+        }
+
+        .app-header .logo-placeholder {
+            background: #ffffff !important;
+            border: 2px solid rgba(255,255,255,.72) !important;
+        }
+
+        .user-badge {
+            background: rgba(255,255,255,.14) !important;
+            border: 1px solid rgba(255,255,255,.28) !important;
+            color: #ffffff !important;
+        }
+
+        .user-avatar,
+        .qtde-c {
+            background: var(--dragao-red) !important;
+            color: #ffffff !important;
+        }
+
+        .admin-bar,
+        .busca-rapida,
+        .filtros-container,
+        .table-container,
+        .stat-card,
+        .modal-content,
+        .agenda-panel,
+        .agenda-board-section,
+        .agenda-summary-card,
+        .cliente-palete-card {
+            background: var(--dragao-panel) !important;
+            border: 1px solid var(--dragao-line) !important;
+            color: var(--dragao-ink) !important;
+            box-shadow: var(--dragao-shadow-sm) !important;
+        }
+
+        .admin-bar,
+        .busca-rapida,
+        .filtros-container,
+        .agenda-panel,
+        .table-container,
+        .stat-card {
+            border-radius: 10px !important;
+        }
+
+        .admin-bar,
+        .filtros-header,
+        .agenda-header,
+        .modal-header {
+            background: linear-gradient(180deg, #ffffff, var(--dragao-panel-soft)) !important;
+            border-bottom: 1px solid var(--dragao-line) !important;
+        }
+
+        .admin-bar {
+            border-left: 5px solid var(--dragao-red) !important;
+        }
+
+        .admin-bar::before {
+            color: var(--dragao-green-800) !important;
+        }
+
+        .action-buttons {
+            gap: 12px !important;
+        }
+
+        .btn-action,
+        .btn-admin,
+        .btn-login,
+        .btn-buscar,
+        .btn-filtrar,
+        .btn-limpar,
+        .btn-mini,
+        .btn-logout,
+        .btn-acao {
+            border-radius: 8px !important;
+            font-weight: 800 !important;
+            letter-spacing: 0 !important;
+        }
+
+        .btn-action {
+            min-height: 46px !important;
+            border: 1px solid transparent !important;
+        }
+
+        .btn-login,
+        .btn-action-primary,
+        .btn-admin,
+        .btn-buscar,
+        .btn-filtrar,
+        .btn-editar {
+            background: var(--dragao-red) !important;
+            color: #ffffff !important;
+            border-color: var(--dragao-red) !important;
+        }
+
+        .btn-login:hover,
+        .btn-action-primary:hover,
+        .btn-admin:hover,
+        .btn-buscar:hover,
+        .btn-filtrar:hover,
+        .btn-editar:hover {
+            background: var(--dragao-red-dark) !important;
+            border-color: var(--dragao-red-dark) !important;
+        }
+
+        .btn-action-success,
+        .btn-retorno {
+            background: var(--dragao-green-700) !important;
+            color: #ffffff !important;
+        }
+
+        .btn-action-warning,
+        .btn-retorno-coleta {
+            background: #f5c84b !important;
+            color: #223128 !important;
+        }
+
+        .btn-action-info,
+        .btn-detalhes {
+            background: var(--dragao-green-800) !important;
+            color: #ffffff !important;
+        }
+
+        .btn-action-purple,
+        .btn-saida-coleta {
+            background: #4b6f59 !important;
+            color: #ffffff !important;
+        }
+
+        .btn-action-secondary,
+        .btn-limpar,
+        .btn-mini,
+        .btn-logout {
+            background: #ffffff !important;
+            color: var(--dragao-green-900) !important;
+            border: 1px solid var(--dragao-line-strong) !important;
+        }
+
+        .btn-action:hover,
+        .btn-admin:hover,
+        .btn-login:hover,
+        .btn-buscar:hover,
+        .btn-filtrar:hover,
+        .btn-limpar:hover,
+        .btn-mini:hover,
+        .btn-logout:hover,
+        .btn-acao:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: var(--dragao-shadow-md) !important;
+        }
+
+        input,
+        select,
+        textarea,
+        .input-group input,
+        .form-group input,
+        .form-group select,
+        .form-group textarea,
+        .busca-grid input,
+        .filtros-grid input,
+        .filtros-grid select {
+            background: #ffffff !important;
+            border: 1px solid var(--dragao-line-strong) !important;
+            color: var(--dragao-ink) !important;
+            border-radius: 8px !important;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--dragao-green-700) !important;
+            box-shadow: 0 0 0 3px rgba(47,141,94,.16) !important;
+        }
+
+        .stat-card {
+            border-top: 4px solid var(--dragao-green-700) !important;
+        }
+
+        .stat-card:hover {
+            border-color: var(--dragao-green-700) !important;
+            box-shadow: var(--dragao-shadow-md) !important;
+        }
+
+        .stat-header i,
+        .stat-cliente-nome {
+            color: var(--dragao-red) !important;
+        }
+
+        .stat-value,
+        .qtde-numero,
+        .agenda-summary-card strong,
+        .agenda-board-item strong,
+        .cliente-palete-card .stat-cliente-valor {
+            color: var(--dragao-green-900) !important;
+        }
+
+        .card-destaque {
+            background: linear-gradient(180deg, #ffffff, #fff5f5) !important;
+            border-top-color: var(--dragao-red) !important;
+            border-left: 0 !important;
+        }
+
+        .table-container {
+            box-shadow: var(--dragao-shadow-md) !important;
+        }
+
+        th {
+            background: var(--dragao-green-900) !important;
+            color: #ffffff !important;
+            border-bottom: 1px solid var(--dragao-green-900) !important;
+        }
+
+        td {
+            color: #294238 !important;
+            border-bottom: 1px solid var(--dragao-line) !important;
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--dragao-green-050) !important;
+        }
+
+        tr:hover {
+            background: #eaf7ef !important;
+        }
+
+        .badge-aberto {
+            background: #fff3cd !important;
+            color: #7a5300 !important;
+        }
+
+        .badge-concluido,
+        .agenda-status.baixado {
+            background: #dff4e7 !important;
+            color: var(--dragao-green-900) !important;
+        }
+
+        .badge-vale {
+            background: #ffe1e3 !important;
+            color: var(--dragao-red-dark) !important;
+        }
+
+        .badge-em-coleta {
+            background: #e3f4ea !important;
+            color: var(--dragao-green-800) !important;
+        }
+
+        .badge-batida {
+            background: #ffe1e3 !important;
+            color: var(--dragao-red-dark) !important;
+        }
+
+        .modal {
+            background: rgba(12, 51, 34, .58) !important;
+        }
+
+        .modal-content {
+            border-top: 5px solid var(--dragao-red) !important;
+            box-shadow: var(--dragao-shadow-lg) !important;
+            margin: 0 auto !important;
+            max-height: calc(100vh - 36px) !important;
+            overflow: hidden !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .modal-body {
+            overflow-y: auto !important;
+            min-height: 0 !important;
+        }
+
+        .modal-close {
+            background: var(--dragao-green-100) !important;
+            color: var(--dragao-green-900) !important;
+        }
+
+        .opcao-retorno,
+        .agenda-summary-card,
+        .agenda-board-section,
+        .agenda-board-item,
+        .agenda-empty,
+        .cliente-palete-card,
+        .registro-card,
+        #resultadoBusca div,
+        #cargasAbertasLista div,
+        #valesLista div,
+        #emColetaLista div,
+        #dadosCargaRetorno,
+        #dadosValeSaida,
+        #dadosRetornoColeta,
+        [style*="background:#0f1a24"],
+        [style*="background:#1e2a3a"],
+        [style*="background:#1a3a2a"] {
+            background: var(--dragao-panel-soft) !important;
+            border-color: var(--dragao-line) !important;
+            color: var(--dragao-ink) !important;
+        }
+
+        .opcao-retorno:hover,
+        .agenda-board-item:hover,
+        .registro-card:hover {
+            background: var(--dragao-green-100) !important;
+            border-color: var(--dragao-green-700) !important;
+        }
+
+        .opcao-retorno.selected {
+            background: var(--dragao-green-100) !important;
+            border-color: var(--dragao-green-700) !important;
+            box-shadow: inset 0 0 0 1px rgba(47,141,94,.22) !important;
+        }
+
+        .agenda-status.pendente {
+            background: #fff3cd !important;
+            color: #7a5300 !important;
+            border-color: #f5c84b !important;
+        }
+
+        .toast {
+            background: #ffffff !important;
+            border: 1px solid var(--dragao-line-strong) !important;
+            border-left: 5px solid var(--dragao-red) !important;
+            color: var(--dragao-ink) !important;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                background:
+                    linear-gradient(180deg, rgba(255,255,255,.92), rgba(238,247,241,.98)),
+                    url("assets/logo_dragao.jpg") right 12px top 12px / 62px auto no-repeat !important;
+            }
+
+            .app-header {
+                position: static !important;
+            }
+
+            .main-wrapper {
+                padding: 10px !important;
+            }
+
+            .login-screen {
+                background:
+                    linear-gradient(180deg, rgba(22,89,57,.92), rgba(238,247,241,.95)),
+                    url("assets/logo_dragao.jpg") center 34px / 220px auto no-repeat !important;
+            }
+        }
     </style>
 </head>
 <body>
