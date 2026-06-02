@@ -4291,6 +4291,11 @@
                 grid-template-columns: 1fr !important;
             }
         }
+
+        /* Ultimo card do dashboard em largura total */
+        #dashboardGrid > .stat-card:last-child {
+            grid-column: 1 / -1 !important;
+        }
     </style>
 </head>
 <body>
