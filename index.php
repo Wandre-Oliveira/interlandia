@@ -4670,6 +4670,62 @@
         .dashboard-area #dashboardGrid.dashboard-horizontal {
             align-items: start !important;
         }
+
+        /* Dashboard mais legivel sem perder area da tabela */
+        .dashboard-area {
+            gap: 5px !important;
+            padding: 6px !important;
+        }
+
+        .dashboard-area #dashboardGrid.dashboard-horizontal {
+            gap: 5px !important;
+            grid-template-columns: repeat(9, minmax(106px, 1fr)) !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-card {
+            min-height: 66px !important;
+            padding: 7px 8px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-header {
+            margin-bottom: 4px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-header i {
+            font-size: 14px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-title {
+            font-size: 9px !important;
+            line-height: 1.1 !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-value {
+            font-size: 21px !important;
+            line-height: 1.05 !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-detalhe {
+            max-height: 28px !important;
+            font-size: 9.5px !important;
+            line-height: 1.18 !important;
+        }
+
+        .dashboard-area #dashboardGrid .clientes-horizontal {
+            min-height: 66px !important;
+            max-height: 82px !important;
+        }
+
+        .dashboard-area #dashboardGrid .clientes-row {
+            max-height: 42px !important;
+            gap: 5px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-cliente-item,
+        .dashboard-area #dashboardGrid .stat-palete-item {
+            padding: 4px 6px !important;
+            font-size: 8.5px !important;
+        }
     </style>
 </head>
 <body>
