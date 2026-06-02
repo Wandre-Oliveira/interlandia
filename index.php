@@ -4347,6 +4347,211 @@
                 grid-template-columns: 1fr !important;
             }
         }
+
+        /* Tabela com mais area util e botoes compactos */
+        .app-header {
+            min-height: 46px !important;
+            padding: 7px 10px !important;
+        }
+
+        .header-logo {
+            gap: 8px !important;
+        }
+
+        .header-logo h1 {
+            font-size: 17px !important;
+            line-height: 1 !important;
+        }
+
+        .user-info {
+            gap: 7px !important;
+            font-size: 11px !important;
+        }
+
+        .main-wrapper {
+            padding: 6px !important;
+        }
+
+        .layout-shell {
+            gap: 6px !important;
+        }
+
+        .side-actions {
+            gap: 6px !important;
+            max-height: calc(100vh - 64px) !important;
+        }
+
+        .side-actions-panel,
+        #adminActionsPanel {
+            padding: 6px !important;
+            border-radius: 6px !important;
+        }
+
+        .side-actions-title {
+            margin: -6px -6px 6px !important;
+            padding: 6px 7px !important;
+            font-size: 8px !important;
+        }
+
+        .side-actions .admin-bar,
+        .side-actions .action-buttons {
+            gap: 4px !important;
+        }
+
+        .side-actions .btn-admin,
+        .side-actions .btn-action {
+            min-height: 28px !important;
+            padding: 5px 7px !important;
+            font-size: 9px !important;
+            border-radius: 5px !important;
+        }
+
+        .side-actions .btn-admin i,
+        .side-actions .btn-action i {
+            width: 14px !important;
+            font-size: 10px !important;
+        }
+
+        .workspace-content {
+            gap: 5px !important;
+        }
+
+        .busca-rapida {
+            padding: 6px !important;
+            border-radius: 6px !important;
+        }
+
+        .busca-grid {
+            gap: 5px !important;
+        }
+
+        .busca-rapida input {
+            min-height: 28px !important;
+            height: 28px !important;
+            padding: 4px 7px !important;
+            font-size: 10px !important;
+        }
+
+        .btn-admin,
+        .btn-action,
+        .btn-buscar,
+        .btn-filtrar,
+        .btn-limpar,
+        .btn-mini,
+        .btn-acao {
+            min-height: 26px !important;
+            padding: 4px 7px !important;
+            font-size: 9px !important;
+            border-radius: 5px !important;
+            line-height: 1.05 !important;
+        }
+
+        .btn-admin i,
+        .btn-action i,
+        .btn-buscar i,
+        .btn-filtrar i,
+        .btn-limpar i,
+        .btn-mini i,
+        .btn-acao i {
+            font-size: 10px !important;
+        }
+
+        .toolbar-extra {
+            margin-top: 4px !important;
+            gap: 4px !important;
+        }
+
+        .toolbar-extra .btn-mini {
+            min-height: 24px !important;
+            padding: 4px 6px !important;
+            font-size: 8.5px !important;
+        }
+
+        .dashboard-area {
+            gap: 4px !important;
+            padding: 4px !important;
+        }
+
+        .dashboard-area #dashboardGrid.dashboard-horizontal {
+            gap: 4px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-card {
+            min-height: 48px !important;
+            padding: 5px 6px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-value {
+            font-size: 16px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-detalhe {
+            max-height: 18px !important;
+            font-size: 8px !important;
+        }
+
+        .dashboard-area #dashboardGrid .clientes-horizontal {
+            min-height: 48px !important;
+            max-height: 58px !important;
+        }
+
+        .dashboard-area .filtros-container {
+            padding-top: 4px !important;
+        }
+
+        .dashboard-area .filtro-field select,
+        .dashboard-area .filtro-field input {
+            min-height: 24px !important;
+            height: 24px !important;
+            padding: 3px 6px !important;
+            font-size: 9px !important;
+        }
+
+        .dashboard-area .filtros-botoes .btn-filtrar,
+        .dashboard-area .filtros-botoes .btn-limpar {
+            min-height: 24px !important;
+            padding: 4px 6px !important;
+            font-size: 8.5px !important;
+        }
+
+        .workspace-content > .table-container,
+        .dashboard-area + .table-container {
+            width: 100% !important;
+            max-width: none !important;
+            min-height: calc(100vh - 138px) !important;
+            max-height: calc(100vh - 62px) !important;
+            border-radius: 5px !important;
+            overflow: auto !important;
+        }
+
+        .workspace-content > .table-container table {
+            min-width: 1900px !important;
+        }
+
+        .table-container th,
+        .table-container td {
+            padding: 5px 6px !important;
+            font-size: 9.5px !important;
+            line-height: 1.15 !important;
+        }
+
+        .table-container tbody tr {
+            height: 30px !important;
+        }
+
+        .table-container .btn-acao {
+            min-height: 22px !important;
+            padding: 3px 5px !important;
+            margin: 1px !important;
+            font-size: 8.5px !important;
+        }
+
+        @media (min-width: 1500px) {
+            .workspace-content > .table-container,
+            .dashboard-area + .table-container {
+                min-height: calc(100vh - 128px) !important;
+            }
+        }
     </style>
 </head>
 <body>
