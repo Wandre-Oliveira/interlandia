@@ -2617,6 +2617,55 @@
             min-width: 0;
         }
 
+        .documentos-panel {
+            display: none;
+            margin-bottom: 18px;
+        }
+
+        .documentos-panel.active {
+            display: block;
+        }
+
+        .documentos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .documentos-lista {
+            display: grid;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        .documento-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            padding: 10px 12px;
+            border: 1px solid var(--dragao-line);
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .documento-card strong {
+            color: var(--dragao-green-900);
+        }
+
+        .documento-meta {
+            color: var(--dragao-muted);
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        .documento-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
         @media (max-width: 1100px) {
             .layout-shell {
                 grid-template-columns: 1fr;
@@ -2967,6 +3016,7 @@
             <button class="btn-action btn-action-purple" id="btnSaidaColeta" onclick="abrirModalSaidaColeta()"><i class="fas fa-truck"></i> SAÍDA PARA COLETAR VALE</button>
             <button class="btn-action btn-action-info" id="btnRetornoColeta" onclick="abrirModalRetornoColeta()"><i class="fas fa-undo-alt"></i> RETORNO DE COLETA</button>
             <button class="btn-action btn-action-success" id="btnAgendaTransportadora" onclick="alternarAgendaTransportadora()"><i class="fas fa-calendar-check"></i> AGENDA TRANSPORTADORA</button>
+            <button class="btn-action btn-action-info" id="btnDocumentos" onclick="alternarDocumentosPanel()"><i class="fas fa-paperclip"></i> ANEXAR DOCUMENTO</button>
             <button class="btn-action btn-action-info" id="btnCadastroMotorista" onclick="abrirModalCadastroMotorista()"><i class="fas fa-id-card"></i> CADASTRAR MOTORISTA</button>
             <button class="btn-action btn-action-secondary" id="btnExportarRelatorio" onclick="exportarRelatorio()"><i class="fas fa-file-excel"></i> EXPORTAR RELATÓRIO</button>
         </div>
@@ -2987,6 +3037,59 @@
             <div class="agenda-summary" id="agendaResumo"></div>
             <div class="agenda-board" id="agendaBoardTransportadora"></div>
             <div class="agenda-table-wrap" id="agendaLista"></div>
+        </section>
+
+        <section id="documentosPanel" class="agenda-panel documentos-panel">
+            <div class="agenda-header">
+                <div>
+                    <h3><i class="fas fa-paperclip"></i> Anexar Documento</h3>
+                    <span>Vincule CTE, CIOT ou Manifesto a uma carga, coleta ou descarrego.</span>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="documentos-grid">
+                    <div class="form-group">
+                        <label class="required">Tipo de documento</label>
+                        <select id="docTipo">
+                            <option value="CTE">CTE</option>
+                            <option value="CIOT">CIOT</option>
+                            <option value="MANIFESTO">MANIFESTO</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Filtrar por origem</label>
+                        <select id="docOrigem" onchange="atualizarRegistrosDocumento()">
+                            <option value="todos">Cargas e descarregos</option>
+                            <option value="carga">Cargas</option>
+                            <option value="agenda">Agenda/descarrego</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Buscar</label>
+                        <input type="text" id="docBusca" placeholder="NF, SAP, cliente, motorista ou placa" oninput="atualizarRegistrosDocumento()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="required">Carga ou descarrego vinculado</label>
+                    <select id="docRegistro" onchange="renderizarDocumentosAnexados()"></select>
+                </div>
+                <div class="documentos-grid">
+                    <div class="form-group">
+                        <label>Numero do documento</label>
+                        <input type="text" id="docNumero" placeholder="Numero do CTE, CIOT ou Manifesto">
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Arquivo</label>
+                        <input type="file" id="docArquivo" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,application/pdf,image/*">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Observacoes</label>
+                    <textarea id="docObservacoes" rows="2" placeholder="Detalhes do documento, viagem, entrada ou saida"></textarea>
+                </div>
+                <button class="btn-login" style="width:auto; min-width:190px;" onclick="salvarDocumentoAnexo()"><i class="fas fa-save"></i> Salvar documento</button>
+                <div id="documentosLista" class="documentos-lista"></div>
+            </div>
         </section>
         
         <!-- Busca Rápida -->
@@ -3278,7 +3381,8 @@ let bancoDados = {
         { id: 5, notaFiscal: "NF-2025005", sap: "1066", clienteId: 1, clienteNome: "ATACADAO S/A", cnpj: "75.315.333/0312-50", endereco: "RODOVIA PE, 7KM", uf: "PE", representanteId: 1, representanteNome: "DIOGO DANTAS", transportadoraId: 2, transportadoraNome: "WELLITON", tipo: "paletizada", qtde: 56, valorUnitario: 150, valorTotal: 8400, motorista: "EDUARDO", placa: "EDU-5678", dataCarga: new Date(Date.now() - 12*24*60*60*1000).toISOString(), dataRetorno: new Date(Date.now() - 8*24*60*60*1000).toISOString(), dataSaidaColeta: null, dataRetornoColeta: null, status: "CONCLUÍDO", observacoes: "", motivoVale: "", motivoNaoColetado: "" }
     ],
     agendaTransportadora: [],
-    motoristasTransportadora: []
+    motoristasTransportadora: [],
+    documentosAnexados: []
 };
 
 const bancoDadosPadrao = JSON.parse(JSON.stringify(bancoDados));
@@ -3343,6 +3447,7 @@ function garantirEstruturaBanco() {
     if (!Array.isArray(bancoDados.cargas)) bancoDados.cargas = [];
     if (!Array.isArray(bancoDados.agendaTransportadora)) bancoDados.agendaTransportadora = [];
     if (!Array.isArray(bancoDados.motoristasTransportadora)) bancoDados.motoristasTransportadora = [];
+    if (!Array.isArray(bancoDados.documentosAnexados)) bancoDados.documentosAnexados = [];
     bancoDados.users.forEach(u => { if (!u.permissoes) u.permissoes = permissoesPadraoPorPerfil(u.role); });
     garantirUsuarioPadrao("encarregado", "123456", "encarregado", "Encarregado");
     garantirUsuarioPadrao("almoxarifado", "123456", "almoxarifado", "Almoxarifado");
@@ -3464,6 +3569,7 @@ function podeCriarAgenda() { return temPermissao('criarAgenda'); }
 function podeBaixarAgenda() { return temPermissao('baixarAgenda'); }
 function podeOperarCargas() { return temPermissao('operarCargas'); }
 function podeExportarRelatorio() { return temPermissao('exportarRelatorio'); }
+function podeAnexarDocumento() { return !!usuarioAtual; }
 function podeCadastrarMotoristaTransportadora() { return isTransportadora() && temPermissao('cadastrarMotorista'); }
 function getPerfilLabel(role) { const perfis = { master: '👑 Master', user: '👤 Motorista', conferente: '📋 Conferente', encarregado: '📦 Encarregado', almoxarifado: '🏭 Almoxarifado', transportadora: '🚚 Transportadora', faturamento: '🧾 Faturamento' }; return perfis[role] || role; }
 function getPerfilColor(role) { const cores = { master: '#daa520', user: '#28a745', conferente: '#8b5cf6', encarregado: '#0891b2', almoxarifado: '#0f766e', transportadora: '#2563eb', faturamento: '#b45309' }; return cores[role] || '#8a9dc0'; }
@@ -3717,6 +3823,7 @@ function aplicarPermissoesTela() {
     setDisplayById('btnSaidaColeta', temPermissao('saidaColeta'), 'flex');
     setDisplayById('btnRetornoColeta', temPermissao('retornoColeta'), 'flex');
     setDisplayById('btnAgendaTransportadora', podeVerAgenda(), 'flex');
+    setDisplayById('btnDocumentos', podeAnexarDocumento(), 'flex');
     setDisplayById('btnCadastroMotorista', podeCadastrarMotoristaTransportadora(), 'flex');
     setDisplayById('btnExportarRelatorio', podeExportarRelatorio(), 'flex');
     setDisplayById('btnNovoAgendaTransportadora', podeCriarAgenda(), '');
@@ -4154,11 +4261,13 @@ function atualizarTabela() {
         row.insertCell(16).innerHTML = renderQtdeComC(c);
         row.insertCell(17).innerHTML = formatarMoeda(c.valorTotal);
         const acoes = row.insertCell(18);
+        const qtdDocsCarga = contarDocumentosRegistro('carga', c.id);
         let bt = `<div style="display:flex; gap:3px; flex-wrap:wrap;">`;
         if (c.status === 'ABERTO' && podeOperarCargas()) bt += `<button class="btn-acao btn-retorno" onclick="event.stopPropagation(); abrirModalRetornoCarga(); document.getElementById('buscaRetornoNF').value='${c.notaFiscal}'; buscarCargaParaRetorno();"><i class="fas fa-undo-alt"></i> Ret</button>`;
         if (c.status === 'VALE PALLETE' && isMaster()) bt += `<button class="btn-acao btn-saida-coleta" onclick="event.stopPropagation(); abrirModalSaidaColeta(); document.getElementById('buscaSaidaNF').value='${c.sap || c.notaFiscal}'; buscarValeParaSaida();"><i class="fas fa-truck"></i> Sair</button>`;
         if (c.status === 'EM COLETA' && isMaster()) bt += `<button class="btn-acao btn-retorno-coleta" onclick="event.stopPropagation(); abrirModalRetornoColeta(); document.getElementById('buscaRetornoNFColeta').value='${c.sap || c.notaFiscal}'; buscarEmColetaParaRetorno();"><i class="fas fa-undo-alt"></i> Ret</button>`;
         if (isMaster()) bt += `<button class="btn-acao btn-editar" onclick="event.stopPropagation(); abrirEdicaoCarga(${JSON.stringify(c).replace(/"/g, '&quot;')});"><i class="fas fa-edit"></i> Editar</button>`;
+        bt += `<button class="btn-acao btn-detalhes" onclick="event.stopPropagation(); abrirDocumentosParaRegistro('carga', ${c.id});"><i class="fas fa-paperclip"></i> Doc${qtdDocsCarga ? ` (${qtdDocsCarga})` : ''}</button>`;
         bt += `<button class="btn-acao btn-detalhes" onclick="event.stopPropagation(); alert('NF: ${c.notaFiscal}\\nCliente: ${c.clienteNome}\\nCidade: ${getCidadeCarga(c) || '-'}\\nSAP: ${c.sap || '-'}\\nTransportadora: ${c.transportadoraNome || '-'}\\nCondicao: ${c.condicaoTransportadora || '-'}\\nStatus: ${c.status}\\nUltima mudança: ${c.ultimaAlteracaoUsuario || c.usuarioNome || '-'}\\nValor: ${formatarMoeda(c.valorTotal)}');"><i class="fas fa-info-circle"></i> Info</button>`;
         bt += `</div>`;
         acoes.innerHTML = bt;
@@ -4439,6 +4548,188 @@ function alternarAgendaTransportadora() {
     painel.classList.toggle('active');
     atualizarAgendaTransportadora();
     if (painel.classList.contains('active')) painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function alternarDocumentosPanel() {
+    if (!podeAnexarDocumento()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    const painel = document.getElementById('documentosPanel');
+    if (!painel) return;
+    painel.classList.toggle('active');
+    if (painel.classList.contains('active')) {
+        atualizarRegistrosDocumento();
+        renderizarDocumentosAnexados();
+        painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function abrirDocumentosParaRegistro(tipo, id) {
+    if (!podeAnexarDocumento()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    const painel = document.getElementById('documentosPanel');
+    if (painel) painel.classList.add('active');
+    const origem = document.getElementById('docOrigem');
+    if (origem) origem.value = tipo === 'agenda' ? 'agenda' : 'carga';
+    atualizarRegistrosDocumento();
+    const select = document.getElementById('docRegistro');
+    if (select) select.value = `${tipo}:${id}`;
+    renderizarDocumentosAnexados();
+    if (painel) painel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function getRegistrosDocumentoVisiveis() {
+    const cargas = getTodasCargas().map(c => ({
+        tipo: 'carga',
+        id: c.id,
+        label: `Carga | NF ${c.notaFiscal || '-'} | ${c.clienteNome || '-'} | ${c.transportadoraNome || '-'}`,
+        busca: [c.notaFiscal, c.sap, c.clienteNome, c.motorista, c.placa, c.transportadoraNome, c.status].join(' ')
+    }));
+    const agendas = getAgendaTransportadoraVisivel().map(a => ({
+        tipo: 'agenda',
+        id: a.id,
+        label: `${a.tipo === 'descarrego' ? 'Descarrego' : 'Agenda nova carga'} | ${a.cliente || '-'} | ${a.transportadora || '-'} | ${a.placa || '-'}`,
+        busca: [a.notaFiscal, a.notaProduto, a.notaPalete, a.cliente, a.motorista, a.placa, a.transportadora, a.status].join(' ')
+    }));
+    return cargas.concat(agendas);
+}
+
+function atualizarRegistrosDocumento() {
+    const select = document.getElementById('docRegistro');
+    if (!select) return;
+    const anterior = select.value;
+    const origem = document.getElementById('docOrigem')?.value || 'todos';
+    const busca = normalizarAgendaValor(document.getElementById('docBusca')?.value || '');
+    let registros = getRegistrosDocumentoVisiveis();
+    if (origem !== 'todos') registros = registros.filter(r => r.tipo === origem);
+    if (busca) registros = registros.filter(r => normalizarAgendaValor(`${r.label} ${r.busca}`).includes(busca));
+    select.innerHTML = registros.length
+        ? registros.map(r => `<option value="${r.tipo}:${r.id}">${htmlSeguro(r.label)}</option>`).join('')
+        : '<option value="">Nenhuma carga ou descarrego disponivel</option>';
+    if (anterior && [...select.options].some(o => o.value === anterior)) select.value = anterior;
+    renderizarDocumentosAnexados();
+}
+
+function getDocumentosVisiveis() {
+    garantirEstruturaBanco();
+    const chavesVisiveis = new Set(getRegistrosDocumentoVisiveis().map(r => `${r.tipo}:${r.id}`));
+    return bancoDados.documentosAnexados.filter(d => chavesVisiveis.has(`${d.tipoRegistro}:${d.registroId}`));
+}
+
+function contarDocumentosRegistro(tipo, id) {
+    garantirEstruturaBanco();
+    return bancoDados.documentosAnexados.filter(d => d.tipoRegistro === tipo && Number(d.registroId) === Number(id)).length;
+}
+
+function formatarTamanhoArquivo(bytes) {
+    const n = Number(bytes) || 0;
+    if (n < 1024) return `${n} B`;
+    if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+    return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function renderizarDocumentosAnexados() {
+    const lista = document.getElementById('documentosLista');
+    if (!lista) return;
+    const selecionado = document.getElementById('docRegistro')?.value || '';
+    let docs = getDocumentosVisiveis();
+    if (selecionado) {
+        const [tipo, id] = selecionado.split(':');
+        docs = docs.filter(d => d.tipoRegistro === tipo && Number(d.registroId) === Number(id));
+    }
+    docs.sort((a, b) => new Date(b.criadoEm || 0) - new Date(a.criadoEm || 0));
+    if (!docs.length) {
+        lista.innerHTML = '<div class="agenda-empty">Nenhum documento anexado para este registro.</div>';
+        return;
+    }
+    lista.innerHTML = docs.map(doc => {
+        const podeExcluir = isMaster() || doc.criadoPor === usuarioLogadoNome();
+        return `
+            <div class="documento-card">
+                <div>
+                    <strong>${htmlSeguro(doc.tipoDocumento || 'Documento')}${doc.numero ? ' - ' + htmlSeguro(doc.numero) : ''}</strong>
+                    <div class="documento-meta">
+                        ${htmlSeguro(doc.registroLabel || `${doc.tipoRegistro}:${doc.registroId}`)}<br>
+                        Arquivo: ${htmlSeguro(doc.arquivoNome || '-')} (${formatarTamanhoArquivo(doc.arquivoTamanho)}) | ${formatarDataHoraAgenda(doc.criadoEm)} | ${htmlSeguro(doc.criadoPor || '-')}
+                        ${doc.observacoes ? `<br>${htmlSeguro(doc.observacoes)}` : ''}
+                    </div>
+                </div>
+                <div class="documento-actions">
+                    <button class="btn-acao btn-detalhes" onclick="abrirDocumentoAnexo(${doc.id})"><i class="fas fa-download"></i> Abrir</button>
+                    ${podeExcluir ? `<button class="btn-acao btn-excluir" onclick="excluirDocumentoAnexo(${doc.id})"><i class="fas fa-trash"></i> Excluir</button>` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function salvarDocumentoAnexo() {
+    if (!podeAnexarDocumento()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    const tipoDocumento = document.getElementById('docTipo')?.value;
+    const registro = document.getElementById('docRegistro')?.value || '';
+    const numero = document.getElementById('docNumero')?.value.trim() || '';
+    const arquivoInput = document.getElementById('docArquivo');
+    const observacoes = document.getElementById('docObservacoes')?.value.trim() || '';
+    const arquivo = arquivoInput?.files?.[0];
+    if (!tipoDocumento || !registro) { mostrarToast('Selecione a carga ou descarrego vinculado.', 'error'); return; }
+    if (!arquivo) { mostrarToast('Selecione o arquivo do documento.', 'error'); return; }
+    if (arquivo.size > 2 * 1024 * 1024) { mostrarToast('Arquivo muito grande. Use ate 2 MB por documento.', 'error'); return; }
+    const [tipoRegistro, idRegistro] = registro.split(':');
+    const alvo = getRegistrosDocumentoVisiveis().find(r => r.tipo === tipoRegistro && Number(r.id) === Number(idRegistro));
+    if (!alvo) { mostrarToast('Registro nao disponivel para este usuario.', 'error'); return; }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+        garantirEstruturaBanco();
+        bancoDados.documentosAnexados.push({
+            id: proximoId(bancoDados.documentosAnexados),
+            tipoDocumento,
+            tipoRegistro,
+            registroId: Number(idRegistro),
+            registroLabel: alvo.label,
+            numero,
+            arquivoNome: arquivo.name,
+            arquivoTipo: arquivo.type || 'application/octet-stream',
+            arquivoTamanho: arquivo.size,
+            arquivoData: reader.result,
+            observacoes,
+            criadoEm: new Date().toISOString(),
+            criadoPor: usuarioLogadoNome()
+        });
+        salvarBanco();
+        if (arquivoInput) arquivoInput.value = '';
+        const campoNumero = document.getElementById('docNumero');
+        const campoObs = document.getElementById('docObservacoes');
+        if (campoNumero) campoNumero.value = '';
+        if (campoObs) campoObs.value = '';
+        renderizarDocumentosAnexados();
+        atualizarTabela();
+        atualizarAgendaTransportadora();
+        mostrarToast('Documento anexado com sucesso!');
+    };
+    reader.onerror = () => mostrarToast('Nao foi possivel ler o arquivo.', 'error');
+    reader.readAsDataURL(arquivo);
+}
+
+function abrirDocumentoAnexo(id) {
+    const doc = getDocumentosVisiveis().find(d => Number(d.id) === Number(id));
+    if (!doc?.arquivoData) { mostrarToast('Documento nao encontrado.', 'error'); return; }
+    const link = document.createElement('a');
+    link.href = doc.arquivoData;
+    link.download = doc.arquivoNome || `${doc.tipoDocumento || 'documento'}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+}
+
+function excluirDocumentoAnexo(id) {
+    const doc = bancoDados.documentosAnexados.find(d => Number(d.id) === Number(id));
+    if (!doc) { mostrarToast('Documento nao encontrado.', 'error'); return; }
+    if (!isMaster() && doc.criadoPor !== usuarioLogadoNome()) { mostrarToast('Apenas o autor ou master pode excluir este documento.', 'error'); return; }
+    if (!confirm('Excluir este documento anexado?')) return;
+    bancoDados.documentosAnexados = bancoDados.documentosAnexados.filter(d => Number(d.id) !== Number(id));
+    salvarBanco();
+    renderizarDocumentosAnexados();
+    atualizarTabela();
+    atualizarAgendaTransportadora();
+    mostrarToast('Documento excluido.', 'info');
 }
 
 function atualizarCamposAgendaTransportadora() {
@@ -4793,6 +5084,7 @@ function atualizarAgendaTransportadora() {
                     ${ordenados.map(item => {
                         const dias = item.status === 'BAIXADO' ? (item.diasBaixa ?? calcularDiasAgenda(item)) : calcularDiasAgenda(item);
                         const statusClass = item.status === 'BAIXADO' ? 'baixado' : 'pendente';
+                        const qtdDocsAgenda = contarDocumentosRegistro('agenda', item.id);
                         return `
                             <tr>
                                 <td><span class="agenda-status ${statusClass}">${item.status === 'BAIXADO' ? 'Baixado' : 'Pendente'}</span></td>
@@ -4808,7 +5100,12 @@ function atualizarAgendaTransportadora() {
                                 <td>${htmlSeguro(item.cliente || '-')}</td>
                                 <td><strong>${dias}</strong></td>
                                 <td>${item.dataBaixa ? `${formatarDataHoraAgenda(item.dataBaixa)}<br><small>${htmlSeguro(item.baixaPor || '')}</small>` : '-'}</td>
-                                <td>${item.status === 'BAIXADO' ? '<span style="color:#64748b;">Arquivado</span>' : (podeBaixarAgenda() ? `<button class="btn-acao btn-retorno" onclick="baixarAgendaTransportadora(${item.id})"><i class="fas fa-check"></i> Baixar</button>` : '<span style="color:#64748b;">Aguardando baixa</span>')}</td>
+                                <td>
+                                    <div style="display:flex; gap:3px; flex-wrap:wrap;">
+                                        <button class="btn-acao btn-detalhes" onclick="abrirDocumentosParaRegistro('agenda', ${item.id})"><i class="fas fa-paperclip"></i> Doc${qtdDocsAgenda ? ` (${qtdDocsAgenda})` : ''}</button>
+                                        ${item.status === 'BAIXADO' ? '<span style="color:#64748b;">Arquivado</span>' : (podeBaixarAgenda() ? `<button class="btn-acao btn-retorno" onclick="baixarAgendaTransportadora(${item.id})"><i class="fas fa-check"></i> Baixar</button>` : '<span style="color:#64748b;">Aguardando baixa</span>')}
+                                    </div>
+                                </td>
                             </tr>
                         `;
                     }).join('')}
