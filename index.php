@@ -4631,6 +4631,45 @@
                 grid-row: auto !important;
             }
         }
+
+        /* Ajuste cirurgico: acoes da tabela e alinhamento do dashboard */
+        .table-container td:last-child {
+            white-space: nowrap !important;
+            padding: 3px 4px !important;
+        }
+
+        .table-container .btn-acao {
+            min-height: 18px !important;
+            padding: 2px 4px !important;
+            margin: 0 1px !important;
+            font-size: 7.5px !important;
+            line-height: 1 !important;
+            border-radius: 4px !important;
+            gap: 2px !important;
+            vertical-align: middle !important;
+        }
+
+        .table-container .btn-acao i {
+            font-size: 8px !important;
+            margin-right: 1px !important;
+        }
+
+        .busca-rapida {
+            padding-bottom: 4px !important;
+        }
+
+        .toolbar-extra {
+            margin-top: 3px !important;
+        }
+
+        .dashboard-area {
+            margin-top: -3px !important;
+            align-self: start !important;
+        }
+
+        .dashboard-area #dashboardGrid.dashboard-horizontal {
+            align-items: start !important;
+        }
     </style>
 </head>
 <body>
