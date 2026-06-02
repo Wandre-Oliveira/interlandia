@@ -4154,6 +4154,143 @@
                 max-height: 62vh !important;
             }
         }
+        /* Dashboard com filtro integrado e compacto */
+        .dashboard-area {
+            display: grid;
+            gap: 7px;
+            padding: 8px;
+            border: 1px solid var(--ui-border) !important;
+            border-radius: 8px !important;
+            background: #ffffff !important;
+            box-shadow: var(--ui-shadow-soft) !important;
+        }
+
+        .dashboard-area #dashboardGrid.dashboard-horizontal {
+            margin: 0 !important;
+            gap: 7px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-card {
+            min-height: 78px !important;
+            padding: 9px 10px !important;
+            border-radius: 6px !important;
+            box-shadow: none !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-header {
+            margin-bottom: 6px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-value {
+            font-size: 21px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-title {
+            font-size: 9px !important;
+        }
+
+        .dashboard-area .filtros-container {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 6px !important;
+            align-items: end !important;
+            margin: 0 !important;
+            padding: 7px 0 0 !important;
+            border: 0 !important;
+            border-top: 1px solid var(--ui-border) !important;
+            border-radius: 0 !important;
+            background: transparent !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+        }
+
+        .dashboard-area .filtros-header {
+            display: none !important;
+        }
+
+        .dashboard-area .filtros-grid {
+            display: grid !important;
+            grid-template-columns: minmax(160px, 1.35fr) minmax(112px, .85fr) minmax(120px, 1fr) minmax(86px, .65fr) minmax(126px, .9fr) minmax(126px, .9fr) !important;
+            gap: 6px !important;
+            align-items: end !important;
+            padding: 0 !important;
+        }
+
+        .dashboard-area .filtros-botoes {
+            display: flex !important;
+            gap: 6px !important;
+            align-items: end !important;
+            padding: 0 !important;
+        }
+
+        .dashboard-area .filtros-botoes .btn-filtrar,
+        .dashboard-area .filtros-botoes .btn-limpar {
+            min-height: 32px !important;
+            padding: 7px 9px !important;
+            font-size: 10px !important;
+            white-space: nowrap;
+        }
+
+        .dashboard-area .filtro-field label {
+            margin-bottom: 2px !important;
+            font-size: 9px !important;
+            line-height: 1 !important;
+            text-transform: uppercase;
+            color: var(--ui-muted) !important;
+        }
+
+        .dashboard-area .filtro-field select,
+        .dashboard-area .filtro-field input {
+            min-height: 32px !important;
+            height: 32px !important;
+            padding: 6px 8px !important;
+            font-size: 11px !important;
+        }
+
+        .dashboard-area + .table-container {
+            min-height: calc(100vh - 208px) !important;
+            max-height: calc(100vh - 76px) !important;
+        }
+
+        @media (min-width: 1500px) {
+            .dashboard-area #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: repeat(6, minmax(136px, 1fr)) !important;
+            }
+
+            .dashboard-area .filtros-grid {
+                grid-template-columns: minmax(190px, 1.5fr) minmax(120px, .8fr) minmax(140px, 1fr) minmax(90px, .6fr) minmax(132px, .85fr) minmax(132px, .85fr) !important;
+            }
+        }
+
+        @media (max-width: 1180px) {
+            .dashboard-area .filtros-container {
+                grid-template-columns: 1fr !important;
+            }
+
+            .dashboard-area .filtros-grid {
+                grid-template-columns: repeat(3, minmax(150px, 1fr)) !important;
+            }
+
+            .dashboard-area .filtros-botoes {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px !important;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .dashboard-area {
+                padding: 6px;
+            }
+
+            .dashboard-area .filtros-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .dashboard-area .filtros-botoes {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -4321,11 +4458,11 @@
             </div>
         </div>
         
-        <!-- Dashboard Horizontal -->
+        <!-- Dashboard e filtros compactos -->
+        <section class="dashboard-area">
         <div class="dashboard-horizontal" id="dashboardGrid"></div>
-        
-        <!-- Filtros -->
-        <div class="filtros-container">
+
+        <div class="filtros-container dashboard-filtros">
             <div class="filtros-header">
                 <div>
                     <h3><i class="fas fa-filter"></i> Filtros do Relatorio</h3>
@@ -4345,6 +4482,7 @@
                 <button class="btn-limpar" onclick="limparFiltros()"><i class="fas fa-eraser"></i> Limpar</button>
             </div>
         </div>
+        </section>
         
         <!-- Tabela -->
         <div class="table-container">
