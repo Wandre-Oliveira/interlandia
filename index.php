@@ -2934,6 +2934,70 @@
             width: auto !important;
         }
 
+        .usuarios-lista {
+            display: grid;
+            gap: 8px;
+            margin: 8px 0 16px;
+        }
+
+        .usuario-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid var(--dragao-line);
+            border-radius: 8px;
+            background: var(--dragao-panel-soft);
+        }
+
+        .usuario-card strong,
+        .usuario-card small {
+            overflow-wrap: anywhere;
+        }
+
+        .usuario-card-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .permissoes-toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .permissoes-toolbar .btn-mini {
+            min-height: 34px;
+            padding: 6px 10px;
+        }
+
+        .workspace-content > .table-container {
+            width: 100%;
+            max-width: none !important;
+            min-height: min(680px, calc(100vh - 170px));
+            max-height: calc(100vh - 150px) !important;
+        }
+
+        .workspace-content > .table-container table {
+            min-width: 1780px;
+        }
+
+        .workspace-content > .table-container th {
+            position: sticky;
+            top: 0;
+        }
+
+        @media (min-width: 1100px) {
+            .workspace-content > .table-container {
+                width: calc(100vw - 340px);
+                max-width: calc(100vw - 340px) !important;
+            }
+        }
+
         @media (max-width: 768px) {
             body {
                 background:
@@ -3790,13 +3854,13 @@
     <div class="form-row"><div class="form-group"><label>Usuário</label><input type="text" id="novoUser"></div><div class="form-group"><label>Senha</label><input type="text" id="novaSenha"></div></div>
     <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="novoNome"></div><div class="form-group"><label>Perfil</label><select id="novoPerfil"><option value="user">👤 Motorista</option><option value="conferente">📋 Conferente</option><option value="encarregado">📦 Encarregado</option><option value="almoxarifado">🏭 Almoxarifado</option><option value="transportadora">🚚 Transportadora</option><option value="faturamento">🧾 Faturamento</option><option value="master">👑 Master</option></select></div></div>
     <div class="form-group"><label>Transportadora vinculada</label><select id="novoTransportadoraUsuario"><option value="">Selecione apenas para perfil Transportadora</option></select></div>
-    <div class="form-group"><label>Permissoes</label><div id="novoPermissoesUsuario" class="permissoes-grid"></div></div>
+    <div class="form-group"><label>Permissoes</label><div class="permissoes-toolbar"><button class="btn-mini" onclick="marcarPermissoesUsuario('novoPermissoesUsuario', true)">Marcar todas</button><button class="btn-mini" onclick="marcarPermissoesUsuario('novoPermissoesUsuario', false)">Limpar</button></div><div id="novoPermissoesUsuario" class="permissoes-grid"></div></div>
     <button class="btn-login" onclick="criarUsuario()">Criar</button>
     <hr><div id="editarUsuarioPanel" style="display:none;"><h3>Editar Usuário</h3><input type="hidden" id="editUserId">
     <div class="form-row"><div class="form-group"><label>Usuário</label><input type="text" id="editUserName"></div><div class="form-group"><label>Senha</label><input type="text" id="editUserPassword"></div></div>
     <div class="form-row"><div class="form-group"><label>Nome</label><input type="text" id="editUserNome"></div><div class="form-group"><label>Perfil</label><select id="editUserPerfil"><option value="user">Motorista</option><option value="conferente">Conferente</option><option value="encarregado">Encarregado</option><option value="almoxarifado">Almoxarifado</option><option value="transportadora">Transportadora</option><option value="faturamento">Faturamento</option><option value="master">Master</option></select></div></div>
     <div class="form-group"><label>Transportadora vinculada</label><select id="editUserTransportadora"><option value="">Selecione apenas para perfil Transportadora</option></select></div>
-    <div class="form-group"><label>Permissoes</label><div id="editPermissoesUsuario" class="permissoes-grid"></div></div>
+    <div class="form-group"><label>Permissoes</label><div class="permissoes-toolbar"><button class="btn-mini" onclick="marcarPermissoesUsuario('editPermissoesUsuario', true)">Marcar todas</button><button class="btn-mini" onclick="marcarPermissoesUsuario('editPermissoesUsuario', false)">Limpar</button></div><div id="editPermissoesUsuario" class="permissoes-grid"></div></div>
     <button class="btn-login" onclick="salvarEdicaoUsuario()">Salvar</button>
     <button class="btn-login" style="background:#6c757d;" onclick="cancelarEdicaoUsuario()">Cancelar</button></div>
 </div></div></div>
@@ -3942,6 +4006,7 @@ function garantirEstruturaBanco() {
     if (!Array.isArray(bancoDados.agendaTransportadora)) bancoDados.agendaTransportadora = [];
     if (!Array.isArray(bancoDados.motoristasTransportadora)) bancoDados.motoristasTransportadora = [];
     if (!Array.isArray(bancoDados.documentosAnexados)) bancoDados.documentosAnexados = [];
+    if (!Array.isArray(bancoDados.usuariosPadraoRemovidos)) bancoDados.usuariosPadraoRemovidos = [];
     bancoDados.users.forEach(u => { if (!u.permissoes) u.permissoes = permissoesPadraoPorPerfil(u.role); });
     garantirUsuarioPadrao("encarregado", "123456", "encarregado", "Encarregado");
     garantirUsuarioPadrao("almoxarifado", "123456", "almoxarifado", "Almoxarifado");
@@ -3951,6 +4016,7 @@ function garantirEstruturaBanco() {
 }
 
 function garantirUsuarioPadrao(username, password, role, nome) {
+    if ((bancoDados.usuariosPadraoRemovidos || []).includes(username)) return;
     if (bancoDados.users.some(u => u.username === username)) return;
     const id = bancoDados.users.reduce((maior, u) => Math.max(maior, Number(u.id) || 0), 0) + 1;
     bancoDados.users.push({ id, username, password, role, nome, permissoes: permissoesPadraoPorPerfil(role) });
@@ -5678,16 +5744,34 @@ function abrirModalUsuarios() {
 }
 function atualizarListaUsuarios() {
     const l = document.getElementById('listaUsuarios');
-    l.innerHTML = '<h3>Usuarios</h3>';
+    l.innerHTML = '<h3>Usuarios</h3><div class="usuarios-lista">';
     bancoDados.users.forEach(u => {
+        const usuarioId = Number(u.id);
         const vinculo = u.role === 'transportadora'
             ? `<br><small>Transportadora: ${htmlSeguro(getTransportadoraUsuarioAtual(u)?.nome || 'Nao vinculada')}</small>`
             : '';
-        l.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #2a3a4a;"><div><strong>${htmlSeguro(u.username)}</strong> <span style="color:${getPerfilColor(u.role)}">(${getPerfilLabel(u.role).replace(/^[^ ]+ /,'')})</span><br><small>Nome: ${htmlSeguro(u.nome)}</small>${vinculo}<br><small style="color:#8a9dc0;">Senha: ${htmlSeguro(u.password)}</small></div><div><button onclick="abrirEdicaoUsuario(${u.id})" style="background:#daa520; border:none; padding:4px 8px; border-radius:4px; margin-right:4px;">Editar</button>${u.id !== 1 ? `<button onclick="excluirUsuario(${u.id})" style="background:#dc3545; border:none; padding:4px 8px; border-radius:4px;">Excluir</button>` : '<span>Master</span>'}</div></div>`;
+        const acaoExcluir = usuarioId !== 1
+            ? `<button class="btn-acao btn-saida-coleta" onclick="excluirUsuario(${usuarioId})"><i class="fas fa-trash"></i> Excluir</button>`
+            : '<span class="badge badge-concluido">Master</span>';
+        l.innerHTML += `
+            <div class="usuario-card">
+                <div>
+                    <strong>${htmlSeguro(u.username)}</strong>
+                    <span style="color:${getPerfilColor(u.role)}">(${getPerfilLabel(u.role).replace(/^[^ ]+ /,'')})</span><br>
+                    <small>Nome: ${htmlSeguro(u.nome)}</small>${vinculo}<br>
+                    <small style="color:#8a9dc0;">Senha: ${htmlSeguro(u.password)}</small>
+                </div>
+                <div class="usuario-card-actions">
+                    <button class="btn-acao btn-editar" onclick="abrirEdicaoUsuario(${usuarioId})"><i class="fas fa-edit"></i> Editar</button>
+                    ${acaoExcluir}
+                </div>
+            </div>
+        `;
     });
+    l.innerHTML += '</div>';
 }
 function abrirEdicaoUsuario(id) {
-    const user = bancoDados.users.find(u => u.id === id);
+    const user = bancoDados.users.find(u => Number(u.id) === Number(id));
     if (!user) return;
     document.getElementById('editUserId').value = user.id;
     document.getElementById('editUserName').value = user.username;
@@ -5701,7 +5785,7 @@ function abrirEdicaoUsuario(id) {
 }
 function salvarEdicaoUsuario() {
     const id = parseInt(document.getElementById('editUserId').value);
-    const user = bancoDados.users.find(u => u.id === id);
+    const user = bancoDados.users.find(u => Number(u.id) === Number(id));
     if (!user) { mostrarToast('Usuario nao encontrado!', 'error'); return; }
     const nu = document.getElementById('editUserName').value.trim();
     const np = document.getElementById('editUserPassword').value.trim();
@@ -5760,6 +5844,31 @@ function abrirModalImportar() {
     document.getElementById('modalImportar').style.display = 'flex';
     document.getElementById('arquivoImportar').value = '';
     document.getElementById('importarSubstituir').checked = false;
+}
+
+function marcarPermissoesUsuario(containerId, marcado) {
+    document.querySelectorAll(`#${containerId} [data-permissao]`).forEach(input => {
+        input.checked = marcado;
+    });
+}
+
+function excluirUsuario(id) {
+    if (!isMaster()) { mostrarToast('Acesso restrito!', 'error'); return; }
+    const usuarioId = Number(id);
+    if (usuarioId === 1) { mostrarToast('Nao pode excluir o Master!', 'error'); return; }
+    const usuario = bancoDados.users.find(u => Number(u.id) === usuarioId);
+    if (!usuario) { mostrarToast('Usuario nao encontrado!', 'error'); return; }
+    if (usuarioAtual && Number(usuarioAtual.id) === usuarioId) { mostrarToast('Nao exclua o usuario logado.', 'error'); return; }
+    if (!confirm(`Excluir o usuario ${usuario.username}?`)) return;
+    if (!Array.isArray(bancoDados.usuariosPadraoRemovidos)) bancoDados.usuariosPadraoRemovidos = [];
+    if (['encarregado', 'almoxarifado', 'transportadora', 'faturamento'].includes(usuario.username) && !bancoDados.usuariosPadraoRemovidos.includes(usuario.username)) {
+        bancoDados.usuariosPadraoRemovidos.push(usuario.username);
+    }
+    bancoDados.users = bancoDados.users.filter(u => Number(u.id) !== usuarioId);
+    if (Number(document.getElementById('editUserId')?.value || 0) === usuarioId) cancelarEdicaoUsuario();
+    salvarBanco();
+    atualizarListaUsuarios();
+    mostrarToast('Usuario excluido!');
 }
 
 function normalizarCampo(v) { return String(v || '').trim(); }
