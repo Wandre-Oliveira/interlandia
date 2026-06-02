@@ -4552,6 +4552,85 @@
                 min-height: calc(100vh - 128px) !important;
             }
         }
+
+        /* Tabela em largura total abaixo do card Operacao */
+        .main-wrapper {
+            width: 100vw !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 5px !important;
+        }
+
+        .layout-shell {
+            display: grid !important;
+            grid-template-columns: minmax(170px, 220px) minmax(0, 1fr) !important;
+            gap: 5px !important;
+            align-items: start !important;
+            width: 100% !important;
+        }
+
+        .side-actions {
+            grid-column: 1 !important;
+            grid-row: 1 / span 2 !important;
+            position: static !important;
+            max-height: none !important;
+            overflow: visible !important;
+            padding-right: 0 !important;
+        }
+
+        .workspace-content {
+            display: contents !important;
+        }
+
+        .workspace-content > .agenda-panel,
+        .workspace-content > .documentos-panel,
+        .workspace-content > .busca-rapida,
+        .workspace-content > .dashboard-area {
+            grid-column: 2 !important;
+            min-width: 0 !important;
+        }
+
+        .workspace-content > .table-container,
+        .dashboard-area + .table-container {
+            grid-column: 1 / -1 !important;
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            min-height: calc(100vh - 184px) !important;
+            max-height: calc(100vh - 56px) !important;
+        }
+
+        .workspace-content > .table-container table {
+            width: max-content !important;
+            min-width: 100% !important;
+        }
+
+        @media (min-width: 1500px) {
+            .layout-shell {
+                grid-template-columns: minmax(180px, 230px) minmax(0, 1fr) !important;
+            }
+
+            .workspace-content > .table-container,
+            .dashboard-area + .table-container {
+                min-height: calc(100vh - 174px) !important;
+            }
+        }
+
+        @media (max-width: 1180px) {
+            .workspace-content {
+                display: grid !important;
+            }
+
+            .side-actions,
+            .workspace-content > .agenda-panel,
+            .workspace-content > .documentos-panel,
+            .workspace-content > .busca-rapida,
+            .workspace-content > .dashboard-area,
+            .workspace-content > .table-container {
+                grid-column: auto !important;
+                grid-row: auto !important;
+            }
+        }
     </style>
 </head>
 <body>
