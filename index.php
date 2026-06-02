@@ -3881,6 +3881,279 @@
                 border-radius: 0 !important;
             }
         }
+        /* Ajuste solicitado: mais aproveitamento de tela e administracao integrada */
+        .main-wrapper {
+            width: 100% !important;
+            max-width: none !important;
+            padding: 8px 10px 12px !important;
+        }
+
+        .app-header {
+            min-height: 58px !important;
+            margin-bottom: 8px !important;
+            padding: 8px 12px !important;
+            border-radius: 8px !important;
+        }
+
+        .logo-placeholder {
+            width: 40px !important;
+            height: 40px !important;
+            flex-basis: 40px !important;
+        }
+
+        .logo-area h1 {
+            font-size: 17px !important;
+        }
+
+        .user-badge {
+            min-height: 38px !important;
+            padding: 4px 8px 4px 4px !important;
+        }
+
+        .user-avatar {
+            width: 34px !important;
+            height: 34px !important;
+        }
+
+        .layout-shell {
+            grid-template-columns: 218px minmax(0, 1fr) !important;
+            gap: 8px !important;
+            margin-top: 8px !important;
+        }
+
+        .side-actions {
+            top: 66px !important;
+            gap: 0 !important;
+            max-height: calc(100vh - 78px) !important;
+            padding-right: 0 !important;
+        }
+
+        .side-actions-panel {
+            padding: 8px !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            background: #ffffff !important;
+        }
+
+        #adminActionsPanel {
+            border-radius: 8px 8px 0 0 !important;
+            border-bottom: 0 !important;
+            background: linear-gradient(180deg, #ffffff, #f1faf4) !important;
+        }
+
+        #adminActionsPanel + .side-actions-panel {
+            border-radius: 0 0 8px 8px !important;
+            border-top: 0 !important;
+        }
+
+        #adminActionsPanel[style*="none"] + .side-actions-panel {
+            border-radius: 8px !important;
+            border-top: 1px solid var(--ui-border) !important;
+        }
+
+        .side-actions-title {
+            min-height: 28px;
+            margin: -8px -8px 8px !important;
+            padding: 8px 9px !important;
+            background: #f3faf6;
+            border-bottom: 1px solid var(--ui-border);
+            font-size: 9px !important;
+        }
+
+        #adminActionsPanel .side-actions-title {
+            background: #e7f4ec;
+            color: #164d35 !important;
+        }
+
+        .side-actions .admin-bar,
+        .side-actions .action-buttons {
+            gap: 5px !important;
+        }
+
+        .side-actions .btn-admin,
+        .side-actions .btn-action {
+            min-height: 34px !important;
+            padding: 7px 8px !important;
+            font-size: 10px !important;
+            border-radius: 6px !important;
+        }
+
+        .workspace-content {
+            gap: 8px !important;
+        }
+
+        .busca-rapida,
+        .filtros-container,
+        .agenda-panel {
+            padding: 10px !important;
+            border-radius: 7px !important;
+        }
+
+        .busca-grid {
+            gap: 8px !important;
+        }
+
+        .toolbar-extra {
+            margin-top: 7px !important;
+            gap: 6px !important;
+        }
+
+        .toolbar-extra .btn-mini {
+            min-height: 32px !important;
+            padding: 6px 9px !important;
+            font-size: 10px !important;
+        }
+
+        #dashboardGrid.dashboard-horizontal {
+            grid-template-columns: repeat(6, minmax(140px, 1fr)) !important;
+            gap: 7px !important;
+        }
+
+        #dashboardGrid .stat-card {
+            min-height: 88px !important;
+            padding: 10px !important;
+            border-radius: 7px !important;
+        }
+
+        #dashboardGrid .stat-value {
+            font-size: 22px !important;
+        }
+
+        #dashboardGrid .stat-detalhe {
+            font-size: 11px !important;
+        }
+
+        #dashboardGrid .clientes-horizontal {
+            grid-column: span 2 !important;
+        }
+
+        .filtros-header,
+        .agenda-header,
+        .modal-header {
+            padding: 9px 11px !important;
+        }
+
+        .filtros-grid {
+            grid-template-columns: repeat(6, minmax(118px, 1fr)) !important;
+            gap: 7px !important;
+            padding: 10px 10px 0 !important;
+        }
+
+        .filtros-botoes {
+            padding: 8px 10px 10px !important;
+        }
+
+        .filtro-field label,
+        .form-group label,
+        .input-group label {
+            margin-bottom: 4px !important;
+            font-size: 11px !important;
+        }
+
+        input,
+        select,
+        textarea {
+            min-height: 34px !important;
+            padding: 8px 10px !important;
+            font-size: 12px !important;
+        }
+
+        .workspace-content > .table-container {
+            min-height: calc(100vh - 235px) !important;
+            max-height: calc(100vh - 84px) !important;
+            border-radius: 7px !important;
+        }
+
+        .workspace-content > .table-container table {
+            min-width: 1760px !important;
+        }
+
+        .table-container th,
+        .table-container td {
+            padding: 7px 7px !important;
+            font-size: 10.5px !important;
+        }
+
+        .table-container tbody tr {
+            height: 38px !important;
+        }
+
+        .btn-acao {
+            min-height: 30px !important;
+            padding: 5px 7px !important;
+            font-size: 10px !important;
+        }
+
+        .modal-content {
+            border-radius: 8px !important;
+        }
+
+        @media (min-width: 1500px) {
+            .layout-shell {
+                grid-template-columns: 230px minmax(0, 1fr) !important;
+            }
+
+            .workspace-content > .table-container {
+                min-height: calc(100vh - 220px) !important;
+            }
+        }
+
+        @media (max-width: 1180px) {
+            .layout-shell {
+                grid-template-columns: 1fr !important;
+            }
+
+            .side-actions {
+                position: static !important;
+                max-height: none !important;
+            }
+
+            .side-actions-panel,
+            #adminActionsPanel,
+            #adminActionsPanel + .side-actions-panel {
+                border-radius: 8px !important;
+                border: 1px solid var(--ui-border) !important;
+            }
+
+            .side-actions {
+                gap: 8px !important;
+            }
+
+            #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            }
+
+            .filtros-grid {
+                grid-template-columns: repeat(3, minmax(140px, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .main-wrapper {
+                padding: 6px !important;
+            }
+
+            .app-header {
+                min-height: auto !important;
+            }
+
+            #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: 1fr !important;
+            }
+
+            #dashboardGrid .clientes-horizontal {
+                grid-column: auto !important;
+            }
+
+            .filtros-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .workspace-content > .table-container {
+                min-height: 62vh !important;
+                max-height: 62vh !important;
+            }
+        }
     </style>
 </head>
 <body>
