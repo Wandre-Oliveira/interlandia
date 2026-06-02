@@ -2940,6 +2940,485 @@
                     url("assets/logo_dragao.jpg") center 34px / 220px auto no-repeat !important;
             }
         }
+
+        /* Responsividade final: desktop, tablet e mobile */
+        html {
+            width: 100%;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        img,
+        svg,
+        canvas,
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+
+        button,
+        input,
+        select,
+        textarea {
+            max-width: 100%;
+        }
+
+        .main-wrapper,
+        .workspace-content,
+        .layout-shell,
+        .app-container {
+            min-width: 0;
+        }
+
+        .app-header {
+            gap: 12px;
+        }
+
+        .app-header > div:first-child {
+            min-width: 0;
+        }
+
+        .app-header h1,
+        .app-header p,
+        .stat-title,
+        .side-actions-title,
+        .btn-admin,
+        .btn-action,
+        .btn-acao {
+            overflow-wrap: anywhere;
+        }
+
+        .busca-grid,
+        .filtros-grid,
+        .documentos-grid,
+        .form-row {
+            min-width: 0;
+        }
+
+        .busca-grid > *,
+        .filtros-grid > *,
+        .documentos-grid > *,
+        .form-row > * {
+            min-width: 0;
+        }
+
+        .toolbar-extra {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-mini,
+        .btn-acao,
+        .btn-admin,
+        .btn-action,
+        .btn-buscar,
+        .btn-filtrar,
+        .btn-limpar,
+        .btn-login {
+            min-height: 40px;
+            touch-action: manipulation;
+        }
+
+        .table-container,
+        .agenda-table-wrap {
+            max-width: 100%;
+            overflow: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-inline: contain;
+        }
+
+        .table-container table,
+        .agenda-table {
+            table-layout: auto;
+        }
+
+        .table-container th,
+        .table-container td,
+        .agenda-table th,
+        .agenda-table td {
+            vertical-align: middle;
+        }
+
+        .modal {
+            padding: 18px;
+            overflow-y: auto;
+            align-items: flex-start;
+        }
+
+        .modal-content {
+            width: min(720px, 100%) !important;
+            max-width: 100% !important;
+            max-height: calc(100dvh - 36px) !important;
+            margin: auto 0;
+        }
+
+        .modal-header {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: inherit;
+        }
+
+        .modal-close {
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        @media (min-width: 1400px) {
+            .main-wrapper {
+                max-width: 1600px;
+                margin-inline: auto;
+            }
+
+            .layout-shell {
+                grid-template-columns: 300px minmax(0, 1fr);
+            }
+
+            .table-container {
+                max-height: 64vh;
+            }
+        }
+
+        @media (max-width: 1180px) {
+            .main-wrapper {
+                padding: 14px !important;
+            }
+
+            .layout-shell {
+                grid-template-columns: 1fr !important;
+                gap: 14px !important;
+            }
+
+            .side-actions {
+                position: sticky !important;
+                top: 0 !important;
+                z-index: 30;
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 8px 0 !important;
+                background: rgba(246, 250, 247, .96);
+                backdrop-filter: blur(10px);
+                border-bottom: 1px solid var(--dragao-line);
+            }
+
+            .side-actions-panel {
+                padding: 10px !important;
+            }
+
+            .side-actions .admin-bar,
+            .side-actions .action-buttons {
+                display: flex !important;
+                flex-direction: row !important;
+                flex-wrap: nowrap !important;
+                gap: 8px !important;
+                min-width: 0 !important;
+                overflow-x: auto;
+                padding-bottom: 2px !important;
+                scrollbar-width: thin;
+            }
+
+            .side-actions .admin-bar[style*="none"],
+            .side-actions .action-buttons[style*="none"] {
+                display: none !important;
+            }
+
+            .side-actions .btn-admin,
+            .side-actions .btn-action {
+                flex: 0 0 auto;
+                width: auto !important;
+                max-width: 230px;
+                white-space: normal !important;
+            }
+
+            #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 820px) {
+            .app-header {
+                position: sticky !important;
+                top: 0;
+                z-index: 40;
+                display: grid !important;
+                grid-template-columns: 1fr;
+                align-items: start !important;
+                padding: 12px !important;
+            }
+
+            .app-header h1 {
+                font-size: 18px !important;
+                line-height: 1.2;
+            }
+
+            .app-header p,
+            .user-info {
+                font-size: 12px !important;
+            }
+
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+                gap: 8px;
+            }
+
+            .busca-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .btn-buscar,
+            .btn-filtrar,
+            .btn-limpar,
+            .nova-carga-actions .btn-login {
+                width: 100% !important;
+            }
+
+            .filtros-grid,
+            .documentos-grid {
+                grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+            }
+
+            .filtros-botoes {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px !important;
+            }
+
+            .agenda-header,
+            .filtros-header {
+                display: grid !important;
+                grid-template-columns: 1fr;
+                gap: 10px;
+                align-items: start !important;
+            }
+
+            .agenda-header .btn-login,
+            #btnNovoAgendaTransportadora {
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .agenda-summary {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            .documento-card {
+                grid-template-columns: 1fr !important;
+            }
+
+            .documento-actions {
+                justify-content: flex-start !important;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr !important;
+                gap: 0 !important;
+            }
+
+            .modal {
+                padding: 10px;
+            }
+
+            .modal-content {
+                border-radius: 10px !important;
+                max-height: calc(100dvh - 20px) !important;
+            }
+
+            .modal-body {
+                padding: 14px !important;
+            }
+
+            .modal-header {
+                padding: 12px 14px !important;
+                gap: 10px;
+            }
+
+            .modal-header h2 {
+                font-size: 15px !important;
+                line-height: 1.25;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .app-container,
+            .main-wrapper,
+            .layout-shell,
+            .workspace-content,
+            .side-actions,
+            .busca-rapida,
+            .filtros-container,
+            .table-container,
+            .agenda-panel {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+            }
+
+            .main-wrapper {
+                padding: 8px !important;
+            }
+
+            .login-card {
+                width: min(100%, 380px) !important;
+                padding: 22px 16px !important;
+                border-radius: 10px !important;
+            }
+
+            .side-actions {
+                margin-inline: 0 !important;
+                padding-inline: 8px !important;
+                overflow-x: hidden !important;
+            }
+
+            .side-actions-panel {
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+                border-left: 0 !important;
+                border-right: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .side-actions .admin-bar,
+            .side-actions .action-buttons {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: auto !important;
+                overflow-y: hidden !important;
+            }
+
+            .side-actions-title {
+                font-size: 10px !important;
+                margin-bottom: 8px !important;
+            }
+
+            .side-actions .btn-admin,
+            .side-actions .btn-action {
+                max-width: 188px;
+                min-height: 42px !important;
+                padding: 9px 10px !important;
+                font-size: 11px !important;
+            }
+
+            .busca-rapida,
+            .filtros-container,
+            .table-container,
+            .agenda-panel,
+            .modal-content {
+                border-radius: 8px !important;
+            }
+
+            .busca-rapida,
+            .filtros-container,
+            .agenda-panel {
+                padding: 12px !important;
+            }
+
+            #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+
+            #dashboardGrid .stat-card {
+                min-height: auto !important;
+                padding: 14px !important;
+            }
+
+            #dashboardGrid .stat-value {
+                font-size: 28px !important;
+            }
+
+            #dashboardGrid .clientes-row {
+                grid-template-columns: 1fr !important;
+                max-height: 260px;
+            }
+
+            .filtros-grid,
+            .documentos-grid,
+            .agenda-summary {
+                grid-template-columns: 1fr !important;
+            }
+
+            .filtros-botoes {
+                grid-template-columns: 1fr !important;
+            }
+
+            .toolbar-extra .btn-mini {
+                flex: 1 1 calc(50% - 6px);
+                min-width: 130px;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 16px !important;
+            }
+
+            .table-container,
+            .agenda-table-wrap {
+                max-height: 58vh !important;
+                margin-inline: -4px;
+                border-radius: 8px !important;
+            }
+
+            table,
+            .agenda-table {
+                min-width: 980px !important;
+                font-size: 10px !important;
+            }
+
+            th,
+            td,
+            .agenda-table th,
+            .agenda-table td {
+                padding: 8px 6px !important;
+            }
+
+            .btn-acao {
+                min-height: 34px !important;
+                padding: 6px 8px !important;
+                font-size: 10px !important;
+            }
+
+            .modal {
+                padding: 0;
+                align-items: stretch;
+            }
+
+            .modal-content {
+                width: 100% !important;
+                height: 100dvh !important;
+                max-height: 100dvh !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                border-left: 0 !important;
+                border-right: 0 !important;
+            }
+
+            .modal-body {
+                padding: 12px !important;
+            }
+
+            .quantidade-container {
+                align-items: stretch !important;
+            }
+
+            .quantidade-container input {
+                min-width: 0;
+            }
+        }
     </style>
 </head>
 <body>
