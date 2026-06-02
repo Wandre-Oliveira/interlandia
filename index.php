@@ -1339,6 +1339,21 @@
         .badge-concluido { background: #ecfdf3 !important; color: #166534 !important; border-color: #bbf7d0; }
         .badge-em-coleta { background: #ecfeff !important; color: #155e75 !important; border-color: #a5f3fc; }
         .badge-batida { background: #fef2f2 !important; color: #991b1b !important; border-color: #fecaca; }
+        .badge-baixado-pendente {
+            background: #ecfdf3 !important;
+            color: #166534 !important;
+            border-color: #bbf7d0 !important;
+            display: inline-flex !important;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            line-height: 1.1;
+        }
+        .badge-baixado-pendente small {
+            color: #9a3412;
+            font-size: 10px;
+            font-weight: 900;
+        }
 
         .modal {
             background: rgba(15, 23, 42, .38) !important;
@@ -4035,6 +4050,19 @@ function formatarData(d) { if (!d) return '-'; return new Date(d).toLocaleDateSt
 function calcularDias(ref) { if (!ref) return 0; return Math.ceil(Math.abs(new Date() - new Date(ref)) / (1000 * 60 * 60 * 24)); }
 function mostrarToast(msg, tipo = 'success') { const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle', warning: 'fa-triangle-exclamation' }; const toast = document.createElement('div'); toast.className = 'toast'; toast.innerHTML = `<i class="fas ${icons[tipo]}"></i> ${msg}`; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
 function getStatusBadge(s) { const b = { 'ABERTO': '<span class="badge badge-aberto">🟡 ABERTO</span>', 'CONCLUÍDO': '<span class="badge badge-concluido">✅ CONCLUÍDO</span>', 'VALE PALLETE': '<span class="badge badge-vale">🎫 VALE PALLETE</span>', 'EM COLETA': '<span class="badge badge-em-coleta">🚚 EM COLETA</span>', 'CARGA BATIDA': '<span class="badge badge-batida">CARGA BATIDA</span>' }; return b[s] || `<span class="badge badge-info">${s}</span>`; }
+function isCargaCasaTransportadoraExterna(carga) {
+    return !!carga &&
+        normalizarAgendaValor(carga.condicaoTransportadora) === 'CASA' &&
+        !isNomeInterlandia(carga.transportadoraNome);
+}
+function getStatusBadgeCarga(carga) {
+    const status = normalizarAgendaValor(carga?.status);
+    const baixada = status.startsWith('CONCLU') || status === 'CARGA BATIDA' || status === 'BAIXADO';
+    if (baixada && isCargaCasaTransportadoraExterna(carga)) {
+        return '<span class="badge badge-baixado-pendente">BAIXADO<small>pendente</small></span>';
+    }
+    return getStatusBadge(carga?.status);
+}
 function formatarCNPJ(i) { let v = i.value.replace(/\D/g, ''); if (v.length <= 14) { v = v.replace(/^(\d{2})(\d)/, '$1.$2'); v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3'); v = v.replace(/\.(\d{3})(\d)/, '.$1/$2'); v = v.replace(/(\d{4})(\d)/, '$1-$2'); i.value = v; } }
 function getRoleAtual() { return usuarioAtual?.role || ''; }
 function isMaster() { return getRoleAtual() === 'master'; }
@@ -4735,7 +4763,7 @@ function atualizarTabela() {
         row.insertCell(11).innerHTML = formatarData(c.dataRetorno);
         row.insertCell(12).innerHTML = formatarData(c.dataSaidaColeta);
         row.insertCell(13).innerHTML = formatarData(c.dataRetornoColeta);
-        row.insertCell(14).innerHTML = getStatusBadge(c.status);
+        row.insertCell(14).innerHTML = getStatusBadgeCarga(c);
         row.insertCell(15).innerHTML = `<strong style="color:${dias > 30 ? '#dc3545' : (dias > 15 ? '#ffc107' : '#28a745')}">${dias}</strong>`;
         row.insertCell(16).innerHTML = renderQtdeComC(c);
         row.insertCell(17).innerHTML = formatarMoeda(c.valorTotal);
@@ -4797,7 +4825,7 @@ function buscarCarga() {
     const div = document.getElementById('resultadoBusca');
     if (!cargas.length) { div.style.display = 'block'; div.innerHTML = '<div style="background:#2a1a1a; padding:12px; border-radius:8px;">❌ Nenhuma carga</div>'; setTimeout(() => div.style.display = 'none', 3000); return; }
     div.style.display = 'block';
-    div.innerHTML = `<div style="background:#0f1a24; padding:12px; border-radius:8px; max-height:300px; overflow-y:auto;"><strong>📋 Encontradas (${cargas.length}):</strong><br>${cargas.map(c => `<div style="padding:8px; margin-top:8px; background:#1e2a3a; border-radius:6px;"><strong>NF:</strong> ${c.notaFiscal} | <strong>Status:</strong> ${getStatusBadge(c.status)}</div>`).join('')}</div>`;
+    div.innerHTML = `<div style="background:#0f1a24; padding:12px; border-radius:8px; max-height:300px; overflow-y:auto;"><strong>📋 Encontradas (${cargas.length}):</strong><br>${cargas.map(c => `<div style="padding:8px; margin-top:8px; background:#1e2a3a; border-radius:6px;"><strong>NF:</strong> ${c.notaFiscal} | <strong>Status:</strong> ${getStatusBadgeCarga(c)}</div>`).join('')}</div>`;
     setTimeout(() => div.style.display = 'none', 5000);
 }
 
