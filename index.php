@@ -3498,6 +3498,389 @@
                 min-width: 0;
             }
         }
+
+        /* Layout polish: professional density and consistent sizing */
+        :root {
+            --ui-page: #eef4f0;
+            --ui-surface: #ffffff;
+            --ui-surface-soft: #f7faf8;
+            --ui-border: #d6e4dc;
+            --ui-border-strong: #b8d0c3;
+            --ui-text: #163026;
+            --ui-muted: #64766e;
+            --ui-green: #1f6b48;
+            --ui-green-soft: #e7f4ec;
+            --ui-red: #d71920;
+            --ui-shadow: 0 10px 28px rgba(22, 80, 54, .10);
+            --ui-shadow-soft: 0 1px 3px rgba(22, 80, 54, .08);
+        }
+
+        html {
+            background: var(--ui-page) !important;
+        }
+
+        body {
+            background:
+                linear-gradient(180deg, rgba(255,255,255,.82), rgba(238,244,240,.98)),
+                var(--ui-page) !important;
+            color: var(--ui-text) !important;
+        }
+
+        .main-wrapper {
+            width: min(100%, 1920px) !important;
+            max-width: none !important;
+            margin: 0 auto !important;
+            padding: 16px 18px 22px !important;
+        }
+
+        .app-header {
+            min-height: 74px;
+            padding: 12px 16px !important;
+            border-radius: 10px !important;
+            background: linear-gradient(90deg, #164d35, #24714d) !important;
+            box-shadow: var(--ui-shadow) !important;
+        }
+
+        .logo-area {
+            gap: 12px !important;
+            min-width: 0;
+        }
+
+        .logo-placeholder {
+            width: 48px !important;
+            height: 48px !important;
+            flex: 0 0 48px;
+        }
+
+        .logo-area h1 {
+            font-size: 19px !important;
+            line-height: 1.15 !important;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-width: 0;
+        }
+
+        .user-badge {
+            min-height: 44px;
+            border-radius: 8px !important;
+        }
+
+        .layout-shell {
+            grid-template-columns: 260px minmax(0, 1fr) !important;
+            gap: 14px !important;
+            margin-top: 14px;
+        }
+
+        .side-actions {
+            top: 92px !important;
+            gap: 10px !important;
+            max-height: calc(100vh - 108px) !important;
+        }
+
+        .side-actions-panel,
+        .busca-rapida,
+        .filtros-container,
+        .agenda-panel,
+        .table-container,
+        .stat-card,
+        .modal-content {
+            border: 1px solid var(--ui-border) !important;
+            border-radius: 8px !important;
+            background: var(--ui-surface) !important;
+            box-shadow: var(--ui-shadow-soft) !important;
+        }
+
+        .side-actions-panel {
+            padding: 10px !important;
+        }
+
+        .side-actions-title {
+            margin-bottom: 8px !important;
+            font-size: 10px !important;
+            color: var(--ui-green) !important;
+        }
+
+        .side-actions .btn-admin,
+        .side-actions .btn-action {
+            min-height: 38px !important;
+            padding: 8px 10px !important;
+            font-size: 11px !important;
+            border-radius: 7px !important;
+            gap: 8px !important;
+        }
+
+        .workspace-content {
+            display: grid;
+            gap: 12px;
+            min-width: 0;
+        }
+
+        .busca-rapida,
+        .filtros-container,
+        .agenda-panel {
+            padding: 14px !important;
+        }
+
+        .busca-grid {
+            grid-template-columns: minmax(260px, 1fr) auto !important;
+            gap: 10px !important;
+        }
+
+        .toolbar-extra {
+            margin-top: 10px;
+        }
+
+        #dashboardGrid.dashboard-horizontal {
+            grid-template-columns: repeat(4, minmax(180px, 1fr)) !important;
+            gap: 10px !important;
+            margin-bottom: 0 !important;
+        }
+
+        #dashboardGrid .stat-card {
+            min-height: 116px;
+            padding: 14px !important;
+        }
+
+        #dashboardGrid .stat-value {
+            font-size: 26px !important;
+            line-height: 1.05 !important;
+        }
+
+        #dashboardGrid .stat-title {
+            font-size: 10px !important;
+            letter-spacing: .04em !important;
+        }
+
+        #dashboardGrid .clientes-horizontal {
+            grid-column: span 2;
+        }
+
+        .filtros-container {
+            overflow: hidden;
+        }
+
+        .filtros-header,
+        .agenda-header,
+        .modal-header {
+            padding: 13px 15px !important;
+            background: var(--ui-surface-soft) !important;
+            border-bottom: 1px solid var(--ui-border) !important;
+        }
+
+        .filtros-grid {
+            grid-template-columns: repeat(6, minmax(130px, 1fr)) !important;
+            gap: 10px !important;
+            padding: 14px 14px 0 !important;
+        }
+
+        .filtros-botoes {
+            padding: 12px 14px 14px !important;
+            gap: 8px !important;
+        }
+
+        input,
+        select,
+        textarea {
+            min-height: 38px !important;
+            border-radius: 7px !important;
+        }
+
+        .btn-action,
+        .btn-admin,
+        .btn-login,
+        .btn-buscar,
+        .btn-filtrar,
+        .btn-limpar,
+        .btn-mini,
+        .btn-acao {
+            border-radius: 7px !important;
+            letter-spacing: 0 !important;
+        }
+
+        .workspace-content > .table-container {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: clamp(420px, 56vh, 720px) !important;
+            max-height: calc(100vh - 128px) !important;
+            overflow: auto !important;
+        }
+
+        .workspace-content > .table-container table {
+            min-width: 1840px !important;
+        }
+
+        .table-container th,
+        .table-container td {
+            padding: 9px 8px !important;
+            font-size: 11px !important;
+            line-height: 1.25 !important;
+        }
+
+        .table-container th {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 5 !important;
+            background: #164d35 !important;
+            color: #ffffff !important;
+        }
+
+        .table-container tbody tr {
+            height: 44px;
+        }
+
+        .table-container tbody tr:hover {
+            background: #edf8f1 !important;
+        }
+
+        .modal {
+            padding: 18px !important;
+        }
+
+        .modal-content {
+            width: min(820px, calc(100vw - 32px)) !important;
+            max-height: calc(100dvh - 36px) !important;
+        }
+
+        #modalUsuarios .modal-content,
+        #modalNovaCarga .modal-content,
+        #modalAgendaTransportadora .modal-content {
+            width: min(980px, calc(100vw - 32px)) !important;
+        }
+
+        .modal-body {
+            padding: 16px !important;
+        }
+
+        .permissoes-grid {
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)) !important;
+        }
+
+        .usuario-card {
+            background: var(--ui-surface-soft) !important;
+        }
+
+        @media (min-width: 1500px) {
+            .layout-shell {
+                grid-template-columns: 280px minmax(0, 1fr) !important;
+            }
+
+            #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: repeat(6, minmax(160px, 1fr)) !important;
+            }
+
+            #dashboardGrid .clientes-horizontal {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 1180px) {
+            .main-wrapper {
+                padding: 12px !important;
+            }
+
+            .layout-shell {
+                grid-template-columns: 1fr !important;
+            }
+
+            .side-actions {
+                position: static !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            .side-actions .admin-bar,
+            .side-actions .action-buttons {
+                flex-direction: row !important;
+                overflow-x: auto !important;
+                padding-bottom: 2px !important;
+            }
+
+            .side-actions .btn-admin,
+            .side-actions .btn-action {
+                width: auto !important;
+                flex: 0 0 auto;
+                white-space: nowrap !important;
+            }
+
+            #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+
+            #dashboardGrid .clientes-horizontal {
+                grid-column: span 2;
+            }
+
+            .filtros-grid {
+                grid-template-columns: repeat(3, minmax(160px, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .main-wrapper {
+                padding: 8px !important;
+            }
+
+            .app-header {
+                position: static !important;
+                grid-template-columns: 1fr !important;
+                gap: 10px !important;
+            }
+
+            .user-area {
+                justify-content: flex-start;
+            }
+
+            .side-actions .admin-bar,
+            .side-actions .action-buttons {
+                gap: 7px !important;
+            }
+
+            .side-actions .btn-admin,
+            .side-actions .btn-action {
+                max-width: 190px;
+                min-height: 40px !important;
+                white-space: normal !important;
+            }
+
+            .busca-grid,
+            .filtros-grid,
+            .form-row,
+            .documentos-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            #dashboardGrid.dashboard-horizontal,
+            #dashboardGrid .clientes-horizontal {
+                grid-template-columns: 1fr !important;
+                grid-column: auto !important;
+            }
+
+            .workspace-content > .table-container {
+                min-height: 58vh !important;
+                margin-inline: 0 !important;
+            }
+
+            .workspace-content > .table-container table {
+                min-width: 1100px !important;
+            }
+
+            .modal {
+                padding: 0 !important;
+            }
+
+            .modal-content {
+                width: 100% !important;
+                height: 100dvh !important;
+                max-height: 100dvh !important;
+                border-radius: 0 !important;
+            }
+        }
     </style>
 </head>
 <body>
