@@ -4552,6 +4552,318 @@
                 min-height: calc(100vh - 128px) !important;
             }
         }
+
+        /* Organizacao profissional do painel principal */
+        .main-wrapper {
+            width: min(100%, 1920px) !important;
+            max-width: none !important;
+            margin: 0 auto !important;
+            padding: 8px 10px 12px !important;
+        }
+
+        .app-header {
+            min-height: 56px !important;
+            margin-bottom: 8px !important;
+            padding: 9px 14px !important;
+        }
+
+        .layout-shell {
+            display: grid !important;
+            grid-template-columns: 240px minmax(0, 1fr) !important;
+            gap: 10px !important;
+            align-items: start !important;
+        }
+
+        .side-actions {
+            position: sticky !important;
+            top: 8px !important;
+            max-height: calc(100vh - 18px) !important;
+            overflow: auto !important;
+            gap: 8px !important;
+        }
+
+        .side-actions-panel,
+        #adminActionsPanel {
+            padding: 8px !important;
+            border-radius: 8px !important;
+        }
+
+        .side-actions-title {
+            margin: -8px -8px 8px !important;
+            padding: 8px 9px !important;
+            font-size: 9px !important;
+            letter-spacing: .08em !important;
+        }
+
+        .side-actions .admin-bar,
+        .side-actions .action-buttons {
+            gap: 6px !important;
+        }
+
+        .side-actions .btn-admin,
+        .side-actions .btn-action {
+            min-height: 34px !important;
+            padding: 7px 9px !important;
+            font-size: 10px !important;
+            border-radius: 6px !important;
+        }
+
+        .workspace-content {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+            min-width: 0 !important;
+        }
+
+        .workspace-content > .dashboard-area {
+            order: 1;
+        }
+
+        .workspace-content > .busca-rapida {
+            order: 2;
+        }
+
+        .workspace-content > .agenda-panel,
+        .workspace-content > .documentos-panel {
+            order: 3;
+        }
+
+        .workspace-content > .table-container {
+            order: 4;
+        }
+
+        .dashboard-area {
+            display: grid !important;
+            gap: 8px !important;
+            padding: 8px !important;
+            border: 1px solid var(--ui-border, #d6e4dc) !important;
+            border-radius: 8px !important;
+            background: var(--ui-surface, #ffffff) !important;
+            box-shadow: var(--ui-shadow-soft, 0 1px 3px rgba(22, 80, 54, .08)) !important;
+        }
+
+        .dashboard-area #dashboardGrid.dashboard-horizontal {
+            display: grid !important;
+            grid-template-columns: repeat(7, minmax(126px, 1fr)) !important;
+            gap: 8px !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: visible !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-card {
+            min-height: 86px !important;
+            max-height: none !important;
+            padding: 10px 11px !important;
+            border-radius: 8px !important;
+            border: 1px solid var(--ui-border, #d6e4dc) !important;
+            border-top: 3px solid var(--kpi-color, #2f8d5e) !important;
+            box-shadow: none !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-card:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 8px 18px rgba(22, 80, 54, .10) !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-header {
+            margin-bottom: 7px !important;
+            gap: 6px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-header i {
+            font-size: 16px !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-title {
+            font-size: 9px !important;
+            line-height: 1.15 !important;
+            letter-spacing: .03em !important;
+            white-space: normal !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-value {
+            font-size: 24px !important;
+            line-height: 1 !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-detalhe {
+            max-height: 34px !important;
+            overflow: hidden !important;
+            font-size: 9.5px !important;
+            line-height: 1.25 !important;
+        }
+
+        .dashboard-area #dashboardGrid .clientes-horizontal {
+            grid-column: span 2 !important;
+            min-height: 86px !important;
+            max-height: 120px !important;
+        }
+
+        .dashboard-area #dashboardGrid .clientes-row {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 5px !important;
+            max-height: 56px !important;
+            overflow: auto !important;
+        }
+
+        .dashboard-area #dashboardGrid .stat-cliente-item,
+        .dashboard-area #dashboardGrid .stat-palete-item {
+            padding: 4px 6px !important;
+            font-size: 8.5px !important;
+            line-height: 1.15 !important;
+        }
+
+        .dashboard-area .filtros-container {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) auto !important;
+            gap: 8px !important;
+            align-items: end !important;
+            padding: 8px !important;
+            border-radius: 7px !important;
+            box-shadow: none !important;
+        }
+
+        .dashboard-area .filtros-header {
+            display: none !important;
+        }
+
+        .dashboard-area .filtros-grid {
+            display: grid !important;
+            grid-template-columns: minmax(150px, 1.4fr) minmax(108px, .8fr) minmax(130px, 1fr) minmax(78px, .55fr) minmax(118px, .85fr) minmax(118px, .85fr) !important;
+            gap: 7px !important;
+            padding: 0 !important;
+        }
+
+        .dashboard-area .filtro-field label {
+            margin-bottom: 2px !important;
+            font-size: 8.5px !important;
+        }
+
+        .dashboard-area .filtro-field select,
+        .dashboard-area .filtro-field input {
+            min-height: 30px !important;
+            height: 30px !important;
+            padding: 4px 7px !important;
+            font-size: 10px !important;
+        }
+
+        .dashboard-area .filtros-botoes {
+            display: flex !important;
+            gap: 6px !important;
+            padding: 0 !important;
+        }
+
+        .dashboard-area .filtros-botoes .btn-filtrar,
+        .dashboard-area .filtros-botoes .btn-limpar {
+            min-height: 30px !important;
+            padding: 5px 9px !important;
+            font-size: 9.5px !important;
+            white-space: nowrap !important;
+        }
+
+        .busca-rapida {
+            padding: 8px !important;
+            border-radius: 8px !important;
+        }
+
+        .busca-grid input {
+            min-height: 32px !important;
+            height: 32px !important;
+            font-size: 11px !important;
+        }
+
+        .toolbar-extra {
+            margin-top: 6px !important;
+        }
+
+        .workspace-content > .table-container,
+        .dashboard-area + .table-container {
+            min-height: calc(100vh - 252px) !important;
+            max-height: calc(100vh - 98px) !important;
+            border-radius: 8px !important;
+        }
+
+        .table-container th,
+        .table-container td {
+            padding: 7px 8px !important;
+            font-size: 10.5px !important;
+        }
+
+        .table-container tbody tr {
+            height: 36px !important;
+        }
+
+        .table-container .btn-acao {
+            min-height: 24px !important;
+            padding: 4px 6px !important;
+            font-size: 8.5px !important;
+        }
+
+        @media (min-width: 1500px) {
+            .layout-shell {
+                grid-template-columns: 250px minmax(0, 1fr) !important;
+            }
+
+            .dashboard-area #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: repeat(9, minmax(120px, 1fr)) !important;
+            }
+
+            .workspace-content > .table-container,
+            .dashboard-area + .table-container {
+                min-height: calc(100vh - 238px) !important;
+            }
+        }
+
+        @media (max-width: 1280px) {
+            .dashboard-area #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: repeat(4, minmax(130px, 1fr)) !important;
+            }
+
+            .dashboard-area .filtros-container {
+                grid-template-columns: 1fr !important;
+            }
+
+            .dashboard-area .filtros-grid {
+                grid-template-columns: repeat(3, minmax(150px, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .layout-shell {
+                grid-template-columns: 1fr !important;
+            }
+
+            .side-actions {
+                position: static !important;
+                max-height: none !important;
+            }
+
+            .dashboard-area #dashboardGrid.dashboard-horizontal {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .main-wrapper {
+                padding: 6px !important;
+            }
+
+            .dashboard-area #dashboardGrid.dashboard-horizontal,
+            .dashboard-area .filtros-grid {
+                grid-template-columns: 1fr !important;
+            }
+
+            .dashboard-area #dashboardGrid .clientes-horizontal {
+                grid-column: auto !important;
+            }
+
+            .dashboard-area .filtros-botoes {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+            }
+        }
     </style>
 </head>
 <body>
