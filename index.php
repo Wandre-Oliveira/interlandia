@@ -5099,18 +5099,12 @@
             text-decoration: underline;
         }
 
-        .agenda-panel,
-        .dashboard-area,
-        .filtros-container {
-            display: none !important;
-        }
-
         .busca-rapida {
             display: flex !important;
             align-items: center !important;
             gap: 8px !important;
-            margin: 0 0 10px !important;
-            padding: 0 !important;
+            margin: 0 0 12px !important;
+            padding: 10px 0 !important;
             border: 0 !important;
             border-radius: 0 !important;
             background: transparent !important;
@@ -5132,17 +5126,25 @@
         }
 
         .busca-grid {
+            flex: 1 1 auto !important;
             width: auto !important;
-            grid-template-columns: 34px !important;
-            gap: 0 !important;
+            grid-template-columns: minmax(240px, 1fr) auto !important;
+            gap: 8px !important;
         }
 
         .busca-grid input {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            opacity: 0 !important;
-            pointer-events: none !important;
+            position: static !important;
+            width: 100% !important;
+            height: 30px !important;
+            min-height: 30px !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            border: 1px solid #cfcfcf !important;
+            border-radius: 3px !important;
+            background: #fff !important;
+            color: var(--po-text) !important;
+            padding: 5px 9px !important;
+            font-size: 11px !important;
         }
 
         .btn-buscar {
@@ -5160,9 +5162,15 @@
             font-size: 13px !important;
         }
 
-        #resultadoBusca,
+        #resultadoBusca {
+            color: var(--po-text) !important;
+        }
+
         .toolbar-extra {
-            display: none !important;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+            margin-top: 0 !important;
         }
 
         .table-container {
